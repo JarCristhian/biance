@@ -1,0 +1,329 @@
+"use client";
+import { FinanceService } from "../services/api";
+import { useEffect, useState } from "react";
+import { GetCategory, StoreFinance } from "../interfaces";
+import { useSession } from "next-auth/react";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/me/drawer";
+import { Input } from "@/components/me/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/me/select";
+import { Calendar } from "@/components/ui/calendar";
+import dayjs from "dayjs";
+import JIcon from "@/components/me/jicon";
+import { toast } from "sonner";
+
+interface Props {
+  show: boolean;
+  type: number;
+  onClose: () => void;
+  onUpdate: (date: string) => void;
+  onTotals: (date: string) => void;
+}
+
+export default function DrawerBiance({
+  show,
+  onClose,
+  type,
+  onUpdate,
+  onTotals,
+}: Props) {
+  const { data: session } = useSession();
+  const financeService = new FinanceService();
+  const [instance, setInstance] = useState<GetCategory[]>([
+    {
+      id: 1,
+      type: 1,
+      name: "Apuestas",
+    },
+    {
+      id: 2,
+      type: 1,
+      name: "Salario Mensual",
+    },
+    {
+      id: 3,
+      type: 1,
+      name: "Salario Extra",
+    },
+    {
+      id: 4,
+      type: 1,
+      name: "Devolución",
+    },
+    {
+      id: 5,
+      type: 2,
+      name: "Desayuno",
+    },
+    {
+      id: 6,
+      type: 2,
+      name: "Almuerzo",
+    },
+    { id: 7, type: 2, name: "Cena" },
+    { id: 8, type: 2, name: "Cuarto" },
+    { id: 9, type: 2, name: "Ropa" },
+    { id: 10, type: 2, name: "Transporte" },
+    { id: 11, type: 2, name: "Diversión" },
+    { id: 12, type: 2, name: "Salud" },
+    { id: 13, type: 2, name: "Educación" },
+    { id: 14, type: 2, name: "Regalos" },
+    { id: 15, type: 2, name: "Prestamos" },
+    { id: 16, type: 2, name: "Otros" },
+    { id: 17, type: 2, name: "Spotify" },
+    { id: 18, type: 2, name: "Netflix" },
+  ]);
+  const [category, setCategories] = useState<GetCategory[]>([]);
+  const [error, setError] = useState<string>("");
+
+  const [staticDate, setStaticDate] = useState<boolean>(true);
+  const [form, setForm] = useState<StoreFinance>({
+    amount: "",
+    description: "",
+    methodPayment: 1,
+    category: null,
+    date: new Date(),
+  });
+
+  // useEffect(() => {
+  //   const getCategories = async () => {
+  //     setInstance([]);
+  //     const response = await financeService.getCategories(session?.user?.token);
+  //     console.log(response);
+
+  //     if (response.data.length !== 0) {
+  //       setInstance(response.data);
+  //     }
+  //   };
+  //   getCategories();
+  // }, []);
+
+  const filterCategory = (data: GetCategory[]) => {
+    const category = data.filter((item) => item.type === type);
+    setCategories(category);
+    setForm({
+      ...form,
+      category: category?.length > 0 ? category[0].id : null,
+    });
+  };
+
+  useEffect(() => {
+    filterCategory(instance);
+    setForm((prevState) => ({
+      ...prevState,
+      date: dayjs().toDate(),
+    }));
+  }, [type]);
+
+  const saveFinance = async () => {
+    if (form.amount == "")
+      return setError("amount"), toast.info("Ingresa el Importe");
+    if (!form.category)
+      return setError("category"), toast.info("Selecciona la categoria");
+
+    try {
+      let data = {
+        ...form,
+        amount: form.amount,
+        category: form.category,
+        methodPayment: +form.methodPayment,
+        type: type,
+      };
+
+      const result = await financeService.postFinances(
+        data,
+        session?.user?.token
+      );
+
+      if (result.status !== 500 && result.status !== 400) {
+        onTotals(dayjs().format("YYYY-MM-DD HH:mm"));
+        toast.success("Se ha registrado correctamente..");
+        clear();
+      } else {
+        toast.error("Error al registrar..");
+      }
+    } catch (error) {
+      toast.error("Error al registrar..");
+    }
+  };
+
+  const clear = () => {
+    setError("");
+    setForm((prevState) => ({
+      ...prevState,
+      amount: "",
+      description: "",
+      methodPayment: 1,
+      date: prevState.date,
+    }));
+  };
+
+  const close = () => {
+    onUpdate(dayjs().format("YYYY-MM-DD HH:mm"));
+    onClose();
+    clear();
+  };
+
+  return (
+    <Drawer open={show} onOpenChange={close}>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle
+            className={
+              "font-bold text-2xl " +
+              (type === 1 ? "text-green-500" : "text-red-500")
+            }
+          >
+            {type === 1 ? "Nuevo Ingreso" : "Nuevo Gasto"}
+          </DrawerTitle>
+          <DrawerDescription>
+            Aqui puedes agregar tus finanzas.
+          </DrawerDescription>
+        </DrawerHeader>
+
+        <div className="flex-1 overflow-y-auto mx-auto w-full max-w-sm p-8 pb-0">
+          <div className="flex flex-col gap-3 items-center justify-center space-x-2">
+            <div className="flex flex-col space-y-2 w-full">
+              <span className={error == "amount" ? "text-amber-400" : ""}>
+                Importe
+              </span>
+              <Input
+                type="number"
+                value={form.amount}
+                onChange={(e) => {
+                  setForm({ ...form, amount: e.target.value }), setError("");
+                }}
+                autoComplete="off"
+                placeholder="0.00"
+              />
+            </div>
+            <div className="flex flex-col space-y-2 w-full">
+              <span className={error == "category" ? "text-amber-400" : ""}>
+                Categoria
+              </span>
+              <Select
+                defaultValue={form.category?.toString()}
+                value={form.category?.toString()}
+                onValueChange={(e) => {
+                  setForm({ ...form, category: parseInt(e) }), setError("");
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {category.map((item, index) => (
+                      <SelectItem key={item.id} value={item.id.toString()}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex flex-col space-y-2 w-full">
+              <span>Metodo de Pago</span>
+              <Select
+                value={form.methodPayment?.toString()}
+                onValueChange={(e) => {
+                  setForm({ ...form, methodPayment: parseInt(e) }),
+                    setError("");
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem key={1} value={(1).toString()}>
+                      Efectivo
+                    </SelectItem>
+                    <SelectItem key={2} value={(2).toString()}>
+                      Transferencia
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex flex-col space-y-2 w-full">
+              <span>Descripción</span>
+              <Input
+                value={form.description}
+                onChange={(e) => {
+                  setForm({ ...form, description: e.target.value }),
+                    setError("");
+                }}
+                autoComplete="off"
+                placeholder="Escribir aqui..."
+              />
+            </div>
+
+            <div className="flex justify-between items-center w-full gap-2 mt-3">
+              {!staticDate ? (
+                <Calendar
+                  className="w-full"
+                  mode="single"
+                  selected={new Date(form.date)}
+                  captionLayout="dropdown"
+                  onSelect={(date) => {
+                    setForm({ ...form, date: date as Date });
+                  }}
+                />
+              ) : (
+                <Input
+                  value={dayjs(form.date).format("DD MMMM YYYY")}
+                  autoComplete="off"
+                  disabled
+                  placeholder="Escribir aqui..."
+                />
+              )}
+
+              <div
+                onClick={() => setStaticDate(!staticDate)}
+                className="flex items-center  justify-center font-medium text-zinc-800 hover:bg-zinc-100/50 active:bg-zinc-100/50 dark:text-white hover:dark:bg-zinc-800/70 active:dark:bg-zinc-900/20 active:scale-90 cursor-pointer duration-200 rounded p-2"
+              >
+                <JIcon name="edit" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <DrawerFooter>
+          <hr />
+          <div className="flex items-center justify-center gap-4 mt-4">
+            <div
+              onClick={close}
+              className="flex items-center gap-1 justify-center text-zinc-800 hover:bg-zinc-100/50 active:bg-zinc-100/50 dark:text-white hover:dark:bg-zinc-800/70 active:dark:bg-zinc-900/20 active:scale-90 cursor-pointer duration-200 rounded-xl py-2 px-6"
+            >
+              Cancelar
+            </div>
+
+            <div
+              onClick={saveFinance}
+              className="flex items-center gap-1 justify-center font-medium text-white bg-zinc-800 active:bg-zinc-800/70 dark:text-zinc-800 dark:bg-zinc-100 active:dark:bg-zinc-200/80 active:scale-90 cursor-pointer duration-200 rounded-xl py-2 px-8"
+            >
+              Guardar
+            </div>
+          </div>
+          {/* <pre>{JSON.stringify(form, null, 2)}</pre> */}
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  );
+}

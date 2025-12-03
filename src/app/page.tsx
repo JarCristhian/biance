@@ -1,0 +1,91 @@
+"use client";
+import { useSession } from "next-auth/react";
+import { Menu } from "../components/me/Menu";
+import { useState } from "react";
+import { NavBar } from "@/components/me/NavBar";
+import TableHome from "./home/components/tableHome";
+import DrawerBiance from "./home/components/drawerBiance";
+import Weekdays from "./home/components/weekdays";
+import dayjs from "dayjs";
+import TotalsHeader from "./home/components/totalsHeader";
+import { useRouter } from "next/navigation";
+
+interface DateI {
+  year: number;
+  month: string;
+  week: number;
+}
+
+export default function Home() {
+  const router = useRouter();
+  const { status } = useSession();
+  const [show, setShow] = useState(false);
+  const [type, setType] = useState(0);
+  const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const [dateTotal, setDateTotal] = useState(dayjs().format("YYYY-MM-DD"));
+  const [dString, setDString] = useState<DateI>({
+    year: dayjs().year(),
+    month: dayjs().month().toString(),
+    week: dayjs().isoWeek(),
+  });
+
+  const getType = (type: number) => {
+    setType(type);
+    setShow(true);
+  };
+
+  if (status === "loading") {
+    return (
+      <div className="loading-page bg-white dark:bg-[#0a0911]">
+        <span className="loader" />
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    router.push("/login");
+  }
+
+  return (
+    <>
+      <Menu onOpen={getType} />
+      <NavBar />
+      <div className="h-screen w-full p-4 overflow-x-hidden overflow-y-scroll scrollbar dark:scrollbar-dark text-zinc-600 dark:text-zinc-200">
+        <main className="items-center p-2 pt-14 md:px-16 w-full max-w-2xl mx-auto">
+          <div className="flex justify-between items-center mb-10 mt-3  select-none">
+            <div className="flex gap-3 justify-start sm:justify-center cursor-pointer">
+              <div className="text-xl font-semibold">Efectivo</div>
+              <div className="text-xl font-semibold text-zinc-300 dark:text-zinc-600">
+                Ahorros
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-end sm:justify-center">
+              <div className="text-xl">
+                <div className="text-sm opacity-90 font-semibold">
+                  <span className="font-bold capitalize">{dString.month}</span>,{" "}
+                  {dString.year}
+                </div>
+                <div className="text-xs opacity-40 -mt-1 font-medium">
+                  Semana {dString.week}
+                </div>
+              </div>
+            </div>
+          </div>
+          <TotalsHeader date={dateTotal} />
+
+          <Weekdays setDate={setDate} setDString={setDString} />
+
+          <TableHome date={date} />
+        </main>
+      </div>
+      <DrawerBiance
+        show={show}
+        type={type}
+        onClose={() => setShow(!show)}
+        onUpdate={setDate}
+        onTotals={setDateTotal}
+      />
+    </>
+  );
+}
