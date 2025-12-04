@@ -9,7 +9,7 @@ export interface GetFinance {
   category: string;
   income: number;
   expense: number;
-  methodPayment: string;
+  paymentMethod: string;
   type: number;
   hour: string;
 }
@@ -19,7 +19,7 @@ export interface StoreFinance {
   amount: string;
   description: string;
   category: string | number | null;
-  methodPayment: number;
+  paymentMethod: number;
   date: Date;
   type?: number;
 }

@@ -93,7 +93,7 @@ export default function DrawerBiance({
   const [form, setForm] = useState<StoreFinance>({
     amount: "",
     description: "",
-    methodPayment: 1,
+    paymentMethod: 1,
     category: null,
     date: new Date(),
   });
@@ -139,7 +139,7 @@ export default function DrawerBiance({
         ...form,
         amount: form.amount,
         category: form.category,
-        methodPayment: +form.methodPayment,
+        paymentMethod: +form.paymentMethod,
         type: type,
       };
 
@@ -166,7 +166,7 @@ export default function DrawerBiance({
       ...prevState,
       amount: "",
       description: "",
-      methodPayment: 1,
+      paymentMethod: 1,
       date: prevState.date,
     }));
   };
@@ -239,9 +239,9 @@ export default function DrawerBiance({
             <div className="flex flex-col space-y-2 w-full">
               <span>Metodo de Pago</span>
               <Select
-                value={form.methodPayment?.toString()}
+                value={form.paymentMethod?.toString()}
                 onValueChange={(e) => {
-                  setForm({ ...form, methodPayment: parseInt(e) }),
+                  setForm({ ...form, paymentMethod: parseInt(e) }),
                     setError("");
                 }}
               >

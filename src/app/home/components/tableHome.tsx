@@ -199,7 +199,7 @@ export default function TableHome({ date }: Props) {
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{invoice.category}</TableCell>
                 <TableCell className="text-xs">{invoice.hour}</TableCell>
-                <TableCell>{invoice.methodPayment}</TableCell>
+                <TableCell>{invoice.paymentMethod}</TableCell>
                 <TableCell>
                   <div
                     className={
