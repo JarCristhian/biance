@@ -9,17 +9,6 @@ interface Props {
   date: string;
 }
 
-//Me quedo con este
-// const itemVariants = {
-//   initial: { opacity: 0, rotateY: 90 },
-//   animate: {
-//     opacity: 1,
-//     rotateY: 0,
-//     transition: { duration: 0.6, ease: "easeInOut" },
-//   },
-// };
-
-//Puede ser
 const itemVariants:Variants  = {
   initial: { opacity: 0, y: 30, skewY: 10 },
   animate: {
@@ -38,20 +27,20 @@ export default function TotalsHeader({ date }: Props) {
   const getTotals = async () => {
     setHeader({ income: 0, expense: 0, total: 0 });
     const response = await financeService.getTotals(session?.user.token);
-    console.log("response totals", response);
+    // console.log("totals", response.data);
 
-    // if (response.data !== 0) {
-    //   setHeader({
-    //     income: response.data.income,
-    //     expense: response.data.expense,
-    //     total: response.data.total,
-    //   });
-    // }
+    if (response.data) {
+      setHeader({
+        income: response.data.income,
+        expense: response.data.expense,
+        total: response.data.total,
+      });
+    }
   };
 
   useEffect(() => {
     if (date) {
-      // getTotals();
+      getTotals();
     }
   }, [date]);
 

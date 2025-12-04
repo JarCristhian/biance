@@ -42,50 +42,7 @@ export default function DrawerBiance({
 }: Props) {
   const { data: session } = useSession();
   const financeService = new FinanceService();
-  const [instance, setInstance] = useState<GetCategory[]>([
-    {
-      id: 1,
-      type: 1,
-      name: "Apuestas",
-    },
-    {
-      id: 2,
-      type: 1,
-      name: "Salario Mensual",
-    },
-    {
-      id: 3,
-      type: 1,
-      name: "Salario Extra",
-    },
-    {
-      id: 4,
-      type: 1,
-      name: "Devolución",
-    },
-    {
-      id: 5,
-      type: 2,
-      name: "Desayuno",
-    },
-    {
-      id: 6,
-      type: 2,
-      name: "Almuerzo",
-    },
-    { id: 7, type: 2, name: "Cena" },
-    { id: 8, type: 2, name: "Cuarto" },
-    { id: 9, type: 2, name: "Ropa" },
-    { id: 10, type: 2, name: "Transporte" },
-    { id: 11, type: 2, name: "Diversión" },
-    { id: 12, type: 2, name: "Salud" },
-    { id: 13, type: 2, name: "Educación" },
-    { id: 14, type: 2, name: "Regalos" },
-    { id: 15, type: 2, name: "Prestamos" },
-    { id: 16, type: 2, name: "Otros" },
-    { id: 17, type: 2, name: "Spotify" },
-    { id: 18, type: 2, name: "Netflix" },
-  ]);
+  const [instance, setInstance] = useState<GetCategory[]>([]);
   const [category, setCategories] = useState<GetCategory[]>([]);
   const [error, setError] = useState<string>("");
 
@@ -98,18 +55,18 @@ export default function DrawerBiance({
     date: new Date(),
   });
 
-  // useEffect(() => {
-  //   const getCategories = async () => {
-  //     setInstance([]);
-  //     const response = await financeService.getCategories(session?.user?.token);
-  //     console.log(response);
+  useEffect(() => {
+    const getCategories = async () => {
+      setInstance([]);
+      const response = await financeService.getCategories(session?.user?.token);
+      // console.log(response);
 
-  //     if (response.data.length !== 0) {
-  //       setInstance(response.data);
-  //     }
-  //   };
-  //   getCategories();
-  // }, []);
+      if (response.data.length !== 0) {
+        setInstance(response.data);
+      }
+    };
+    getCategories();
+  }, []);
 
   const filterCategory = (data: GetCategory[]) => {
     const category = data.filter((item) => item.type === type);
