@@ -2,7 +2,7 @@
 import { FinanceService } from "../services/api";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import JIcon from "@/components/me/jicon";
 
 interface Props {
@@ -20,7 +20,7 @@ interface Props {
 // };
 
 //Puede ser
-const itemVariants = {
+const itemVariants:Variants  = {
   initial: { opacity: 0, y: 30, skewY: 10 },
   animate: {
     opacity: 1,

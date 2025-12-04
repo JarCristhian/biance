@@ -3,7 +3,7 @@ import { FinanceService } from "../services/api";
 import { useEffect, useState } from "react";
 import { GetFinance } from "../interfaces";
 import { useSession } from "next-auth/react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 // import {
 //   Table,
 //   TableBody,
@@ -19,7 +19,7 @@ interface Props {
   date: string;
 }
 
-const itemVariants = {
+const itemVariants:Variants = {
   initial: { opacity: 0, y: 50 },
   animate: {
     opacity: 1,
@@ -28,7 +28,7 @@ const itemVariants = {
   },
 };
 
-const totalChilds = {
+const totalChilds:Variants = {
   initial: { opacity: 0, rotateY: 90 },
   animate: {
     opacity: 1,

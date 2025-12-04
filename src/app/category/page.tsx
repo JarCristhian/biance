@@ -1,7 +1,7 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { CategoryService } from "./services/api";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import {
   Table,
   TableBody,
@@ -11,12 +11,11 @@ import {
   TableRow,
 } from "@/components/me/Table";
 import JIcon from "@/components/me/jicon";
-
 import { useEffect, useState, useCallback } from "react";
 import { GetCategory, StoreCategory } from "./interfaces";
 import DrawerCategory from "./drawerCategory";
 
-const itemVariants = {
+const itemVariants: Variants = {
   initial: { opacity: 0, y: 50 },
   animate: {
     opacity: 1,

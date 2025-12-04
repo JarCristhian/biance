@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
@@ -18,7 +18,7 @@ interface Props {
   setDString: (date: DateI) => void;
 }
 
-const itemVariants = {
+const itemVariants:Variants = {
   initial: { opacity: 0, x: -100 },
   animate: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
