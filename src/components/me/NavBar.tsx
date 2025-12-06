@@ -207,16 +207,16 @@ export function NavBar() {
                   : "hover:font-semibold hover:dark:text-zinc-200"
               }
             >
-              Graphics
+              Graficos
             </div>
             <div
               className={
-                pathname == "reports"
+                pathname == "tasks"
                   ? "font-semibold dark:text-zinc-200"
                   : "hover:font-semibold hover:dark:text-zinc-200"
               }
             >
-              Reportes
+              Tareas
             </div>
           </div>
         </div>

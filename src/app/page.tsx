@@ -52,7 +52,8 @@ export default function Home() {
       <NavBar />
       <div className="h-screen w-full p-4 overflow-x-hidden overflow-y-scroll scrollbar dark:scrollbar-dark text-zinc-600 dark:text-zinc-200">
         <main className="items-center p-2 pt-14 md:px-16 w-full max-w-2xl mx-auto">
-          <div className="flex justify-between items-center mb-10 mt-3  select-none">
+
+          <div className="flex justify-between items-center mb-10 mt-3 md:px-20 px-4 select-none">
             <div className="flex gap-3 justify-start sm:justify-center cursor-pointer">
               <div className="text-xl font-semibold">Efectivo</div>
               <div className="text-xl font-semibold text-zinc-300 dark:text-zinc-600">

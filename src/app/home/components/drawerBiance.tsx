@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/me/select";
+import { Spinner } from "@/components/ui/spinner";
 import { Calendar } from "@/components/ui/calendar";
 import dayjs from "dayjs";
 import JIcon from "@/components/me/jicon";
@@ -45,8 +46,8 @@ export default function DrawerBiance({
   const [instance, setInstance] = useState<GetCategory[]>([]);
   const [category, setCategories] = useState<GetCategory[]>([]);
   const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const [staticDate, setStaticDate] = useState<boolean>(true);
   const [form, setForm] = useState<StoreFinance>({
     amount: "",
     description: "",
@@ -92,6 +93,7 @@ export default function DrawerBiance({
       return setError("category"), toast.info("Selecciona la categoria");
 
     try {
+      setLoading(true);
       let data = {
         ...form,
         amount: form.amount,
@@ -109,6 +111,9 @@ export default function DrawerBiance({
         onTotals(dayjs().format("YYYY-MM-DD HH:mm"));
         toast.success("Se ha registrado correctamente..");
         clear();
+        setTimeout(() => {
+          setLoading(false);
+        }, 300);
       } else {
         toast.error("Error al registrar..");
       }
@@ -152,25 +157,9 @@ export default function DrawerBiance({
         </DrawerHeader>
 
         <div className="flex-1 overflow-y-auto mx-auto w-full max-w-sm p-8 pb-0">
-          <div className="flex flex-col gap-3 items-center justify-center space-x-2">
+          <div className="flex flex-col gap-4 items-center justify-center space-x-2">
+           
             <div className="flex flex-col space-y-2 w-full">
-              <span className={error == "amount" ? "text-amber-400" : ""}>
-                Importe
-              </span>
-              <Input
-                type="number"
-                value={form.amount}
-                onChange={(e) => {
-                  setForm({ ...form, amount: e.target.value }), setError("");
-                }}
-                autoComplete="off"
-                placeholder="0.00"
-              />
-            </div>
-            <div className="flex flex-col space-y-2 w-full">
-              <span className={error == "category" ? "text-amber-400" : ""}>
-                Categoria
-              </span>
               <Select
                 defaultValue={form.category?.toString()}
                 value={form.category?.toString()}
@@ -178,8 +167,11 @@ export default function DrawerBiance({
                   setForm({ ...form, category: parseInt(e) }), setError("");
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger className={error == "category" ? "border border-amber-400" : ""}>
+                  <div className="flex items-center gap-2">
+                  <JIcon name="stack" width='w-4' />
                   <SelectValue placeholder="Seleccione" />
+                  </div>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -193,8 +185,7 @@ export default function DrawerBiance({
               </Select>
             </div>
 
-            <div className="flex flex-col space-y-2 w-full">
-              <span>Metodo de Pago</span>
+            <div className="w-full">
               <Select
                 value={form.paymentMethod?.toString()}
                 onValueChange={(e) => {
@@ -203,7 +194,10 @@ export default function DrawerBiance({
                 }}
               >
                 <SelectTrigger>
+                  <div className="flex items-center gap-2">
+                  <JIcon name="paymentMethod" width="w-4" />
                   <SelectValue placeholder="Seleccione" />
+                  </div>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -218,8 +212,20 @@ export default function DrawerBiance({
               </Select>
             </div>
 
-            <div className="flex flex-col space-y-2 w-full">
-              <span>Descripción</span>
+             <div className="w-full">
+              <Input
+              className={error == "amount" ? "border border-amber-400" : ""}
+                type="number"
+                value={form.amount}
+                onChange={(e) => {
+                  setForm({ ...form, amount: e.target.value }), setError("");
+                }}
+                autoComplete="off"
+                placeholder="$ 0.00"
+              />
+            </div>
+
+            <div className="w-full">
               <Input
                 value={form.description}
                 onChange={(e) => {
@@ -227,12 +233,11 @@ export default function DrawerBiance({
                     setError("");
                 }}
                 autoComplete="off"
-                placeholder="Escribir aqui..."
+                placeholder="Descripción..."
               />
             </div>
 
-            <div className="flex justify-between items-center w-full gap-2 mt-3">
-              {!staticDate ? (
+            <div className="flex justify-center items-center w-full px-4 mt-2">
                 <Calendar
                   className="w-full"
                   mode="single"
@@ -242,21 +247,6 @@ export default function DrawerBiance({
                     setForm({ ...form, date: date as Date });
                   }}
                 />
-              ) : (
-                <Input
-                  value={dayjs(form.date).format("DD MMMM YYYY")}
-                  autoComplete="off"
-                  disabled
-                  placeholder="Escribir aqui..."
-                />
-              )}
-
-              <div
-                onClick={() => setStaticDate(!staticDate)}
-                className="flex items-center  justify-center font-medium text-zinc-800 hover:bg-zinc-100/50 active:bg-zinc-100/50 dark:text-white hover:dark:bg-zinc-800/70 active:dark:bg-zinc-900/20 active:scale-90 cursor-pointer duration-200 rounded p-2"
-              >
-                <JIcon name="edit" />
-              </div>
             </div>
           </div>
         </div>
@@ -273,8 +263,9 @@ export default function DrawerBiance({
 
             <div
               onClick={saveFinance}
-              className="flex items-center gap-1 justify-center font-medium text-white bg-zinc-800 active:bg-zinc-800/70 dark:text-zinc-800 dark:bg-zinc-100 active:dark:bg-zinc-200/80 active:scale-90 cursor-pointer duration-200 rounded-xl py-2 px-8"
+              className="flex items-center gap-3 justify-center font-medium text-white bg-zinc-800 active:bg-zinc-800/70 dark:text-zinc-800 dark:bg-zinc-100 active:dark:bg-zinc-200/80 active:scale-90 cursor-pointer duration-200 rounded-xl py-2 px-8"
             >
+              {loading  && <Spinner />}
               Guardar
             </div>
           </div>

@@ -106,8 +106,10 @@ export default function TableHome({ date }: Props) {
 
       <div className="flex flex-col items-center w-full sm:w-4/5 md:w-5/6 justify-center mt-6">
         <h3 className="text-xl font-semibold mb-2 opacity-85">
-          Transacciones del día
+          Transacciones del día  {finance.length ? `(${finance.length})` : ""}
         </h3>
+
+        <div className="flex flex-col items-center w-full overflow-y-scroll scrollbar dark:scrollbar-dark h-[30vh]">
 
         {finance.map((invoice, index) => (
           <div
@@ -171,6 +173,7 @@ export default function TableHome({ date }: Props) {
             </svg>
           </div>
         )}
+        </div>
       </div>
     </motion.div>
   );
