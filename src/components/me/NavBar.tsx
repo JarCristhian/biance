@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/me/dropdown";
 import Image from "next/image";
-import picachu from "../../../src/app/img/picachu.jpg";
+import picachu from "../../../public/img/picachu.jpg";
 import { Toaster } from "sonner";
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";

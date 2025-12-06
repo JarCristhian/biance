@@ -29,6 +29,7 @@ export default function Category() {
   const categoryService = new CategoryService();
   const [category, setCategories] = useState<GetCategory[]>([]);
   const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [dataCategory, setDataCategory] = useState<StoreCategory>({
     name: "",
     typeId: 1,
@@ -38,12 +39,16 @@ export default function Category() {
   const getCategories = useCallback(async () => {
     if (!session?.user?.token) return;
     try {
+      setLoading(true);
       setCategories([]);
       const response = await categoryService.getCategories(session.user.token);
       // console.log(response);
 
       if (response.status === 200) {
         setCategories(response.data);
+        setTimeout(() => {
+          setLoading(false);
+        }, 300);
       }
     } catch (error) {
       console.error("Error al obtener las categorías:", error);
@@ -84,8 +89,8 @@ export default function Category() {
   };
 
   return (
-    <div className="h-screen w-full p-4 overflow-x-hidden overflow-y-scroll scrollbar dark:scrollbar-dark">
-      <main className="items-center p-2 pt-14 md:p-16">
+    <div className="h-screen w-full max-w-xl mx-auto overflow-x-hidden overflow-y-scroll scrollbar dark:scrollbar-dark">
+      <main className="items-center p-2 mt-20">
         <div className="flex gap-3 justify-around  mb-10 mt-3 select-none">
           <div className="text-xl font-semibold">Categorias</div>
           <div
@@ -116,10 +121,17 @@ export default function Category() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {category.map((item, index) => (
-                  <TableRow key={item.id} className="group">
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center">
+                      Cargando...
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  category.map((item, index) => (
+                    <TableRow key={item.id} className="group">
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell
                       className={
                         item.type == 1 ? "text-green-500" : "text-red-500"
                       }
@@ -137,9 +149,9 @@ export default function Category() {
                       </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                )))}
 
-                {category.length == 0 && (
+                {!loading && category.length == 0 && (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center opacity-10">
                       <span className="flex items-center justify-center mt-2">
@@ -170,6 +182,7 @@ export default function Category() {
           </div>
         </motion.div>
       </main>
+
       <DrawerCategory
         show={show}
         onClose={() => setShow(!show)}
