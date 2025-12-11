@@ -198,11 +198,14 @@ export function NavBar() {
                   : "hover:font-semibold hover:dark:text-zinc-200"
               }
             >
-              Home
+              Inicio
             </div>
             <div
+              onClick={() => {
+                router.push("/graphics");
+              }}
               className={
-                pathname == "grafhics"
+                pathname === "/graphics"
                   ? "font-semibold dark:text-zinc-200"
                   : "hover:font-semibold hover:dark:text-zinc-200"
               }
@@ -210,8 +213,11 @@ export function NavBar() {
               Graficos
             </div>
             <div
+              onClick={() => {
+                router.push("/tasks");
+              }}
               className={
-                pathname == "tasks"
+                pathname === "/tasks"
                   ? "font-semibold dark:text-zinc-200"
                   : "hover:font-semibold hover:dark:text-zinc-200"
               }
