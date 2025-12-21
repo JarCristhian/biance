@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/me/Table";
+import { Input } from "@/components/me/input";
 import JIcon from "@/components/me/jicon";
 import { useEffect, useState, useCallback } from "react";
 import { GetCategory, StoreCategory } from "./interfaces";
@@ -30,6 +31,8 @@ export default function Category() {
   const [category, setCategories] = useState<GetCategory[]>([]);
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("")
+
   const [dataCategory, setDataCategory] = useState<StoreCategory>({
     name: "",
     typeId: 1,
@@ -90,16 +93,30 @@ export default function Category() {
 
   return (
     <div className="h-screen w-full max-w-xl mx-auto overflow-x-hidden overflow-y-scroll scrollbar dark:scrollbar-dark">
-      <main className="items-center p-2 mt-20">
-        <div className="flex gap-3 justify-around  mb-10 mt-3 select-none">
+      <main className="items-center mt-20">
+
+        <div className="flex gap-3 justify-between max-w-2xl mb-10 mt-3 px-8 select-none">
           <div className="text-xl font-semibold">Categorias</div>
-          <div
-            className="flex items-center justify-center text-green-500 hover:bg-green-100/50 active:bg-green-100/50
-           hover:dark:bg-green-900/20 active:dark:bg-green-900/20 
-           active:scale-90 duration-200 rounded-xl py-1 px-3 cursor-pointer"
-            onClick={newCategory}
-          >
-            + Nuevo
+          <div className="flex gap-2">
+
+            <Input
+              className="h-7 text-xs"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+              }}
+              autoComplete="off"
+              placeholder="Buscar..."
+            />
+
+            <div
+              className="flex items-center w-[120px] justify-center text-green-500 hover:bg-green-100/50 active:bg-green-100/50
+            hover:dark:bg-green-900/20 active:dark:bg-green-900/20 
+            active:scale-90 duration-200 rounded-xl py-1 px-3 cursor-pointer"
+              onClick={newCategory}
+            >
+              + Nuevo
+            </div>
           </div>
         </div>
 
@@ -107,7 +124,7 @@ export default function Category() {
           variants={itemVariants}
           initial="initial"
           animate="animate"
-          className="flex justify-center"
+          className="flex justify-center overflow-auto h-[70dvh]"
         >
           <div className="flex items-center justify-center">
             <Table>
@@ -130,26 +147,26 @@ export default function Category() {
                 ) : (
                   category.map((item, index) => (
                     <TableRow key={item.id} className="group">
-                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{index}</TableCell>
                       <TableCell
-                      className={
-                        item.type == 1 ? "text-green-500" : "text-red-500"
-                      }
-                    >
-                      {item.type == 1 ? "+Ingreso" : "-Gasto"}
-                    </TableCell>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.createdAt}</TableCell>
-                    <TableCell>
-                      <div
-                        className="block md:hidden group-hover:block cursor-pointer active:scale-90 duration-200"
-                        onClick={() => editCategory(item)}
+                        className={
+                          item.type == 1 ? "text-green-500" : "text-red-500"
+                        }
                       >
-                        <JIcon name="edit" width="w-5" />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )))}
+                        {item.type == 1 ? "+ Ingreso" : "- Gasto"}
+                      </TableCell>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>{item.createdAt}</TableCell>
+                      <TableCell>
+                        <div
+                          className="block md:hidden group-hover:block cursor-pointer active:scale-90 duration-200"
+                          onClick={() => editCategory(item)}
+                        >
+                          <JIcon name="edit" width="w-5" />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )))}
 
                 {!loading && category.length == 0 && (
                   <TableRow>

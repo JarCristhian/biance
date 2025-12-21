@@ -21,8 +21,6 @@ export default function Home() {
   const { status } = useSession();
   const [show, setShow] = useState(false);
   const [type, setType] = useState(0);
-  const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"));
-  const [dateTotal, setDateTotal] = useState(dayjs().format("YYYY-MM-DD"));
   const [dString, setDString] = useState<DateI>({
     year: dayjs().year(),
     month: dayjs().month().toString(),
@@ -73,19 +71,18 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <TotalsHeader date={dateTotal} />
 
-          <Weekdays setDate={setDate} setDString={setDString} />
+          <TotalsHeader />
 
-          <TableHome date={date} />
+          <Weekdays setDString={setDString} />
+
+          <TableHome />
         </main>
       </div>
       <DrawerBiance
         show={show}
         type={type}
         onClose={() => setShow(!show)}
-        onUpdate={setDate}
-        onTotals={setDateTotal}
       />
     </>
   );

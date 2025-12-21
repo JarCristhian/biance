@@ -4,12 +4,10 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { motion, type Variants } from "framer-motion";
 import JIcon from "@/components/me/jicon";
+import NumberFlow, { continuous } from '@number-flow/react'
+import { useGlobalStore } from "@/store/globalState";
 
-interface Props {
-  date: string;
-}
-
-const itemVariants:Variants  = {
+const itemVariants: Variants = {
   initial: { opacity: 0, y: 30, skewY: 10 },
   animate: {
     opacity: 1,
@@ -19,10 +17,11 @@ const itemVariants:Variants  = {
   },
 };
 
-export default function TotalsHeader({ date }: Props) {
+export default function TotalsHeader() {
   const { data: session } = useSession();
   const financeService = new FinanceService();
   const [header, setHeader] = useState({ income: 0, expense: 0, total: 0 });
+  const refreshFinance = useGlobalStore((state) => state.refreshFinance);
 
   const getTotals = async () => {
     setHeader({ income: 0, expense: 0, total: 0 });
@@ -37,21 +36,23 @@ export default function TotalsHeader({ date }: Props) {
       });
     }
   };
-
+  3
   useEffect(() => {
-    if (date) {
-      getTotals();
-    }
-  }, [date]);
+    getTotals();
+  }, [refreshFinance]);
 
   return (
     <motion.div variants={itemVariants} initial="initial" animate="animate">
       <div className="grid text-left sm:text-center mb-10 select-none">
         <div className="flex items-center justify-center gap-10">
           <div className="flex flex-col items-center">
-            <div className="text-3xl font-semibold">
-              S/. {header.total.toFixed(2)}
-            </div>
+            <NumberFlow
+              className="text-3xl font-semibold"
+              plugins={[continuous]}
+              locales="es-PE"
+              format={{ style: 'currency', currency: 'PEN' }}
+              value={header.total}
+            />
             <div className="font-semibold text-zinc-400 dark:text-zinc-600">
               disponible
             </div>

@@ -5,7 +5,7 @@ interface Props {
 export function Menu({ onOpen }: Props) {
   return (
     <div className="relative select-none cursor-pointer flex justify-center">
-      <div className="flex items-center justify-between fixed z-10 bottom-7 group w-80 h-12 rounded-md py-2 px-4 drop-shadow-md bg-white dark:bg-zinc-900">
+      <div className="flex items-center justify-between fixed z-10 bottom-5 group w-80 h-12 rounded-md py-2 px-4 drop-shadow-md bg-white dark:bg-zinc-900">
         <div className="text-xl font-semibold">Biance</div>
         <div className="flex gap-1">
           <div

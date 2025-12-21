@@ -1,8 +1,16 @@
 import { create } from "zustand";
+import dayjs from "dayjs";
 
-export const useGlobalStore = create((set) => ({
+interface GlobalState {
+    refreshFinance: boolean;
+    daySelected: string;
+    setRefreshFinance: () => void;
+    setDaySelected: (state: string) => void;
+}
+
+export const useGlobalStore = create<GlobalState>((set) => ({
     refreshFinance: false,
-    refreshCategory: false,
-    setRefreshFinance: (state: boolean) => set({ refreshFinance: state }),
-    setRefreshCategory: (state: boolean) => set({ refreshCategory: state }),
-}))
+    daySelected: dayjs().format("YYYY-MM-DD"),
+    setRefreshFinance: () => set((prev) => ({ refreshFinance: !prev.refreshFinance })),
+    setDaySelected: (state: string) => set({ daySelected: state }),
+}));

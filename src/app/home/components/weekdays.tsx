@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import isoWeek from "dayjs/plugin/isoWeek";
+import { useGlobalStore } from "@/store/globalState";
 dayjs.locale("es");
 dayjs.extend(isoWeek);
 
@@ -14,18 +15,18 @@ interface DateI {
 }
 
 interface Props {
-  setDate: (date: string) => void;
   setDString: (date: DateI) => void;
 }
 
-const itemVariants:Variants = {
+const itemVariants: Variants = {
   initial: { opacity: 0, x: -100 },
   animate: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
-export default function Weekdays({ setDate, setDString }: Props) {
+export default function Weekdays({ setDString }: Props) {
   const [week, setWeek] = useState(dayjs().isoWeek());
   const [year, setYear] = useState(dayjs().year());
+  const { setDaySelected } = useGlobalStore();
 
   const [days, setDays] = useState<
     { day: string; number: number; date: string; active: boolean }[]
@@ -78,7 +79,7 @@ export default function Weekdays({ setDate, setDString }: Props) {
     }));
 
     setDays(updatedDays);
-    setDate(date);
+    setDaySelected(date);
   };
 
   return (
@@ -104,11 +105,10 @@ export default function Weekdays({ setDate, setDString }: Props) {
         {days.map((day) => (
           <div
             key={day.day}
-            className={`flex items-center justify-center h-12 w-12 rounded-2xl cursor-pointer select-none  ${
-              day.active
-                ? "text-zinc-800 dark:text-white bg-zinc-200/70 dark:bg-zinc-800/70"
-                : "text-zinc-400/80 hover:text-zinc-800  hover:dark:text-white  "
-            }`}
+            className={`flex items-center justify-center h-12 w-12 rounded-2xl cursor-pointer select-none  ${day.active
+              ? "text-zinc-800 dark:text-white bg-zinc-200/70 dark:bg-zinc-800/70"
+              : "text-zinc-400/80 hover:text-zinc-800  hover:dark:text-white  "
+              }`}
             onClick={() => setValue(day.date)}
           >
             <div className="flex flex-col items-center">

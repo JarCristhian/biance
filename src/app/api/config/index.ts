@@ -62,7 +62,7 @@ export class Languages {
     theme: "Tema",
     logout: "Salir",
     login: "Iniciar Sesion",
-    welcome: "Bienvenido a Glance.",
+    welcome: "Bienvenido a Biance.",
     user: "Usuario",
     pass: "Contraseña",
     created: "~ Crear cuenta ツ",
