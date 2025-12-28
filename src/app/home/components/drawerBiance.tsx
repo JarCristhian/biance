@@ -156,7 +156,7 @@ export default function DrawerBiance({
             {type === 1 ? "Nuevo Ingreso" : "Nuevo Gasto"}
           </DrawerTitle>
           <DrawerDescription>
-            Aqui puedes agregar tus finanzas. {daySelected}
+            Aqui puedes agregar tus finanzas.
           </DrawerDescription>
         </DrawerHeader>
 

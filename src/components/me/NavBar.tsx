@@ -9,7 +9,7 @@ import {
 import Image from "next/image";
 import picachu from "../../../public/img/picachu.jpg";
 import { Toaster } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useSession, signOut } from "next-auth/react";
@@ -20,6 +20,18 @@ export function NavBar() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const [show, setShow] = useState<boolean>(false);
+  const [greeting, setGreeting] = useState<string>("");
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) {
+      setGreeting("Buenos días");
+    } else if (hour < 18) {
+      setGreeting("Buenas tardes");
+    } else {
+      setGreeting("Buenas noches");
+    }
+  }, []);
 
   if (session) {
     let userT: any;
@@ -31,22 +43,25 @@ export function NavBar() {
       <div className="relative select-none cursor-pointer flex justify-center">
         <Toaster position="top-center" duration={1000} richColors />
         <div className="flex justify-between items-center fixed z-10 top-3  w-96 h-10 rounded-md py-2 px-4 drop-shadow-md  bg-white dark:bg-zinc-900">
-          <div className="flex items-center">
+          <div className="flex items-center gap-1">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center group p-1 space-x-1.5 cursor-pointer rounded-sm hover:bg-gray-100/50 active:bg-gray-100/50 hover:dark:bg-zinc-700/70 active:dark:bg-zinc-800/90 active:scale-90 duration-200">
+                <div className="flex items-center group px-1 gap-2 cursor-pointer rounded-sm hover:bg-gray-100/50 active:bg-gray-100/50 hover:dark:bg-zinc-700/70 active:dark:bg-zinc-800/90 active:scale-90 duration-200">
                   <Image
-                    className="w-5 h-5 rounded-full group-hover:animate-spin"
+                    className="w-6 h-6 rounded-full group-hover:animate-spin"
                     src={userT}
                     alt=""
                     unoptimized={true}
                     priority={true}
                   />
-                  <div className="flex items-center space-x-0.5">
-                    <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                      {session.user.user.name}
-                    </span>
-                    <div className="w-4 h-4 opacity-50 mt-1">
+                  <div className="flex items-center gap-1">
+                    <div className="flex flex-col -space-y-1.5">
+                      <span className="text-sm font-medium text-zinc-900 dark:text-white">
+                        {session.user.user.name}
+                      </span>
+                      <span className="text-xs opacity-50">{greeting}</span>
+                    </div>
+                    <div className="w-5 h-5 opacity-50 mt-1">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 16 16"
