@@ -135,7 +135,7 @@ export default function TasksPage() {
       <div className=" bg-white/70 dark:bg-zinc-950/70 backdrop-blur-2xl border-b border-zinc-200/60 dark:border-zinc-800/50 pt-16 pb-4 mt-2">
 
         <div className="max-w-lg mx-auto space-y-6">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center px-4">
             <div className="flex flex-col -space-y-1">
               <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
                 Tareas
@@ -167,7 +167,7 @@ export default function TasksPage() {
         </div>
       </div>
 
-      <main className="max-w-xl mx-auto md:px-6 px-4 py-8 pb-32">
+      <main className="max-w-xl mx-auto md:px-6 px-4 py-4 pb-32">
         <motion.div
           variants={containerVariants}
           initial="initial"
@@ -181,7 +181,7 @@ export default function TasksPage() {
                 variants={itemVariants}
                 layout
                 onClick={() => editTask(task)}
-                className="group relative bg-white dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 p-5 rounded-[28px] transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800/40 active:scale-[0.98] cursor-pointer"
+                className="group relative bg-white dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 p-4 rounded-[28px] transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800/40 active:scale-[0.98] cursor-pointer"
               >
                 <div className="flex items-start gap-4">
                   {/* Status Icon */}

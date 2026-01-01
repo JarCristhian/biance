@@ -160,7 +160,7 @@ export default function DrawerBiance({
           </DrawerDescription>
         </DrawerHeader>
 
-        <div className="flex-1 overflow-y-auto mx-auto w-full max-w-sm p-8 pb-0">
+        <div className="flex-1 overflow-y-auto mx-auto w-full max-w-sm px-8 py-4 pb-0">
           <div className="flex flex-col gap-4 items-center justify-center space-x-2">
 
             <div className="flex flex-col space-y-2 w-full">
@@ -171,7 +171,7 @@ export default function DrawerBiance({
                   setForm({ ...form, category: parseInt(e) }), setError("");
                 }}
               >
-                <SelectTrigger className={error == "category" ? "border border-amber-400" : ""}>
+                <SelectTrigger className={`h-11 rounded-xl ${error == "category" ? 'border border-amber-400' : ''}`}>
                   <div className="flex items-center gap-2">
                     <JIcon name="stack" width='w-4' />
                     <SelectValue placeholder="Seleccione" />
@@ -197,7 +197,7 @@ export default function DrawerBiance({
                     setError("");
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger className={`h-11 rounded-xl `}>
                   <div className="flex items-center gap-2">
                     <JIcon name="paymentMethod" width="w-4" />
                     <SelectValue placeholder="Seleccione" />
@@ -218,7 +218,7 @@ export default function DrawerBiance({
 
             <div className="w-full">
               <Input
-                className={error == "amount" ? "border border-amber-400" : ""}
+                className={`h-11 rounded-xl ${error == "amount" ? 'border border-amber-400' : ''}`}
                 type="number"
                 value={form.amount}
                 onChange={(e) => {
@@ -231,6 +231,7 @@ export default function DrawerBiance({
 
             <div className="w-full">
               <Input
+                className={`h-11 rounded-xl ${error == "description" ? 'border border-amber-400' : ''}`}
                 value={form.description}
                 onChange={(e) => {
                   setForm({ ...form, description: e.target.value }),
@@ -255,22 +256,25 @@ export default function DrawerBiance({
           </div>
         </div>
 
-        <DrawerFooter>
-          <hr />
-          <div className="flex items-center justify-center gap-4">
-            <div
-              onClick={close}
-              className="flex items-center gap-1 justify-center text-zinc-800 hover:bg-zinc-100/50 active:bg-zinc-100/50 dark:text-white hover:dark:bg-zinc-800/70 active:dark:bg-zinc-900/20 active:scale-90 cursor-pointer duration-200 rounded-xl py-2 px-6"
-            >
-              Cancelar
-            </div>
+        <DrawerFooter className="px-6">
+          <hr className="mb-2" />
 
-            <div
-              onClick={saveFinance}
-              className="flex items-center gap-3 justify-center font-medium text-white bg-zinc-800 active:bg-zinc-800/70 dark:text-zinc-800 dark:bg-zinc-100 active:dark:bg-zinc-200/80 active:scale-90 cursor-pointer duration-200 rounded-xl py-2 px-8"
-            >
-              {loading && <Spinner />}
-              Guardar
+          <div className="mx-auto w-full max-w-xs">
+            <div className="flex items-center gap-3">
+              <div
+                onClick={close}
+                className="flex items-center gap-1 justify-center text-zinc-800 hover:bg-zinc-100/50 active:bg-zinc-100/50 dark:text-white hover:dark:bg-zinc-800/70 active:dark:bg-zinc-900/20 active:scale-90 cursor-pointer duration-200 rounded-xl py-2 px-6"
+              >
+                Cancelar
+              </div>
+
+              <div
+                onClick={saveFinance}
+                className="flex-1 items-center justify-center text-center content-center text-lg h-12 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-bold shadow-lg shadow-zinc-900/10 dark:shadow-none transition-all active:scale-95"
+              >
+                {loading && <Spinner />}
+                Guardar
+              </div>
             </div>
           </div>
           {/* <pre>{JSON.stringify(form, null, 2)}</pre> */}

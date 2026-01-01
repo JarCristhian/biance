@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/me/select";
 import { toast } from "sonner";
-import { Calendar, Clock, DollarSign, Tag, AlignLeft, CheckCircle2 } from "lucide-react";
+import { Calendar, Clock, DollarSign, Tag, CheckCircle2, CalendarPlus, CalendarSync } from "lucide-react";
 
 interface Props {
   show: boolean;
@@ -96,24 +96,31 @@ export default function DrawerTask({
     <Drawer open={show} onOpenChange={close}>
       <DrawerContent className="bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800">
         <div className="mx-auto w-full max-w-sm">
-          <DrawerHeader className="mt-2 pb-2 text-left">
-            <div className="flex items-center justify-between">
-              <DrawerTitle className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-                {data.id ? (isReadOnly ? "Detalles de Tarea" : "Editar Tarea") : "Nueva Tarea"}
-              </DrawerTitle>
-              {isReadOnly && (
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-black uppercase tracking-tighter">
-                  <CheckCircle2 className="w-3 h-3" />
-                  Completada
-                </div>
-              )}
-            </div>
-            <DrawerDescription className="text-zinc-500 dark:text-zinc-400">
-              {isReadOnly
-                ? "Esta tarea está completada y no se puede editar."
-                : "Completa los detalles de tu tarea a continuación."}
-            </DrawerDescription>
-          </DrawerHeader>
+
+          <div className="flex items-center gap-1 mt-2 mx-2">
+            {isReadOnly ? (
+              <div className="flex items-center p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+            ) : (
+              <div className="flex items-center p-3 rounded-2xl bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border border-zinc-500/20">
+                {data.id ? <CalendarSync className="w-5 h-5" /> : <CalendarPlus className="w-5 h-5" />}
+              </div>
+            )}
+
+            <DrawerHeader className="pb-2 text-left">
+              <div className="flex items-center justify-between">
+                <DrawerTitle className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+                  {data.id ? (isReadOnly ? "Detalles de Tarea" : "Editar Tarea") : "Nueva Tarea"}
+                </DrawerTitle>
+              </div>
+              <DrawerDescription className="text-zinc-500 dark:text-zinc-400">
+                {isReadOnly
+                  ? "Esta tarea está completada y no se puede editar."
+                  : "Completa los detalles de tu tarea a continuación."}
+              </DrawerDescription>
+            </DrawerHeader>
+          </div>
 
           <div className="p-2 pt-2 space-y-4">
             <div className="space-y-4">
