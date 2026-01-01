@@ -230,7 +230,7 @@ function Login() {
               <div className="text-center mb-10">
                 <div className="w-12 h-12 mx-auto mb-4 border border-white/40 flex items-center justify-center text-white text-2xl font-bold"
                   style={{ clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)' }}>
-                  B
+                  <img src={'/favicon.ico'} alt="favicon" className="w-10 h-10" />
                 </div>
                 <h1 className="text-3xl font-bold text-white tracking-[0.2em] mb-1">BIANCE</h1>
                 <p className="tech-tag">STARK_INTERFACE</p>
