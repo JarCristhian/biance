@@ -108,7 +108,7 @@ export default function DrawerTask({
               </div>
             )}
 
-            <DrawerHeader className="pb-2 text-left">
+            <DrawerHeader className="pb-2 text-left -space-y-1.5">
               <div className="flex items-center justify-between">
                 <DrawerTitle className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
                   {data.id ? (isReadOnly ? "Detalles de Tarea" : "Editar Tarea") : "Nueva Tarea"}
@@ -124,7 +124,6 @@ export default function DrawerTask({
 
           <div className="p-2 pt-2 space-y-4">
             <div className="space-y-4">
-              {/* Título */}
               <div className="space-y-1.5 opacity-100 transition-opacity">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Título</label>
                 <div className="relative">
@@ -137,12 +136,11 @@ export default function DrawerTask({
                     }}
                     autoComplete="off"
                     placeholder="Escribe el título"
-                    className={`pl-4 h-11 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 focus:ring-2 focus:ring-zinc-900/10 dark:focus:ring-zinc-100/10 transition-all ${error === 'title' ? 'border-zinc-400 ring-2 ring-zinc-400/20' : ''} ${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    className={`${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
                   />
                 </div>
               </div>
 
-              {/* Descripción */}
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Descripción</label>
                 <div className="relative">
@@ -151,12 +149,11 @@ export default function DrawerTask({
                     value={form.description}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
                     placeholder="Detalles adicionales..."
-                    className={`w-full min-h-[80px] px-4 py-3 text-sm rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 focus:border-zinc-300 dark:focus:border-zinc-700 outline-none transition-all resize-none text-zinc-800 dark:text-zinc-200 ${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    className={`w-full min-h-[80px] px-4 py-3 text-sm rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border  border-zinc-200 dark:border-zinc-800 focus:ring-1 focus:ring-zinc-900/40 dark:focus:ring-zinc-200 focus:border-zinc-900/10 dark:focus:border-zinc-100/10 outline-none transition-all resize-none text-zinc-800 dark:text-zinc-200 ${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
                   />
                 </div>
               </div>
 
-              {/* Categoría y Monto */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Categoría</label>
@@ -165,7 +162,7 @@ export default function DrawerTask({
                     value={form.type}
                     onValueChange={(val) => setForm({ ...form, type: val })}
                   >
-                    <SelectTrigger className={`h-11 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 ${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                    <SelectTrigger className={`${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}>
                       <SelectValue placeholder="Tipo" />
                     </SelectTrigger>
                     <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
@@ -187,13 +184,12 @@ export default function DrawerTask({
                       type="number"
                       value={form.amount}
                       onChange={(e) => setForm({ ...form, amount: parseFloat(e.target.value) })}
-                      className={`pl-8 h-11 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 focus:ring-2 focus:ring-zinc-900/10 dark:focus:ring-zinc-100/10 transition-all ${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      className={`pl-8 ${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Fecha y Hora */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Fecha</label>
@@ -202,7 +198,7 @@ export default function DrawerTask({
                     type="date"
                     value={form.date}
                     onChange={(e) => setForm({ ...form, date: e.target.value })}
-                    className={`h-11 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 focus:ring-2 focus:ring-zinc-900/10 dark:focus:ring-zinc-100/10 transition-all ${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    className={`${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -212,7 +208,7 @@ export default function DrawerTask({
                     type="time"
                     value={form.hour}
                     onChange={(e) => setForm({ ...form, hour: e.target.value })}
-                    className={`h-11 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 focus:ring-2 focus:ring-zinc-900/10 dark:focus:ring-zinc-100/10 transition-all ${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    className={`${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
                   />
                 </div>
               </div>

@@ -14,7 +14,8 @@ import {
   ChevronRight,
   ArrowUpRight,
   CheckCircle2,
-  Circle
+  Circle,
+  Ban,
 } from "lucide-react";
 
 const itemVariants: Variants = {
@@ -136,13 +137,36 @@ export default function TasksPage() {
 
         <div className="max-w-lg mx-auto space-y-6">
           <div className="flex justify-between items-center px-4">
-            <div className="flex flex-col -space-y-1">
-              <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
+            <div className="flex flex-col -space-y-0.5">
+              <h1 className="text-2xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
                 Tareas
               </h1>
-              <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium mt-0.5">
-                {tasks.filter(t => t.status === 'pending').length} por completar
-              </p>
+
+              {tasks.length > 0 && (
+                <div className="flex items-center gap-2 opacity-70">
+                  {tasks.filter(t => t.status === 'completed').length > 0 && (
+                    <div className="flex items-center gap-1 text-zinc-500 dark:text-zinc-400 text-xs font-medium mt-0.5">
+                      {tasks.filter(t => t.status === 'completed').length}
+                      <CheckCircle2 className="w-3 h-3" strokeWidth={3} />
+                    </div>
+                  )}
+
+                  {tasks.filter(t => t.status === 'pending').length > 0 && (
+                    <div className="flex items-center gap-1 text-zinc-500 dark:text-zinc-400 text-xs font-medium mt-0.5">
+                      {tasks.filter(t => t.status === 'pending').length}
+                      <Clock className="w-3 h-3" strokeWidth={3} />
+                    </div>
+                  )}
+
+                  {tasks.filter(t => t.status === 'cancelled').length > 0 && (
+                    <div className="flex items-center gap-1 text-zinc-500 dark:text-zinc-400 text-xs font-medium mt-0.5">
+                      {tasks.filter(t => t.status === 'cancelled').length}
+                      <Ban className="w-3 h-3" strokeWidth={3} />
+                    </div>
+                  )}
+                </div>
+              )}
+
             </div>
 
             <div className="flex items-center gap-2">
