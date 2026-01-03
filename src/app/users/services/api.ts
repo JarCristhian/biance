@@ -1,5 +1,5 @@
 import api from "@/app/api/apiClient";
-import { StoreCategory } from "../interfaces";
+import { StoreUser } from "../interfaces";
 
 export interface Params {
   page?: number;
@@ -17,7 +17,7 @@ export class CategoryService {
     });
     return result;
   }
-  async postCategory(data: StoreCategory, token?: string) {
+  async postCategory(data: StoreUser, token?: string) {
     const result = await api.post("category", data, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -27,7 +27,7 @@ export class CategoryService {
 
     return result;
   }
-  async updateCategory(id: number, data: StoreCategory, token?: string) {
+  async updateCategory(id: number, data: StoreUser, token?: string) {
     const result = await api.patch(`category/${id}`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
