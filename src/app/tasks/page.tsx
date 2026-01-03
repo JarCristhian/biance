@@ -205,7 +205,7 @@ export default function TasksPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans">
-      <div className=" bg-white/70 dark:bg-zinc-950/70 backdrop-blur-2xl border-b border-zinc-200/60 dark:border-zinc-800/50 pt-16 pb-4 mt-2">
+      <div className="bg-white/70 dark:bg-zinc-950/70 backdrop-blur-2xl border-b border-zinc-200/60 dark:border-zinc-800/50 pt-16 pb-4 mt-2">
 
         <div className="max-w-lg mx-auto px-4">
           <AnimatePresence mode="wait">
@@ -221,7 +221,7 @@ export default function TasksPage() {
                   <h1 className="text-2xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
                     Tareas
                   </h1>
-                  <p className="text-[10px]  tracking-[0.2em] font-black text-zinc-400 dark:text-zinc-500">
+                  <p className="text-[10px] font-black text-zinc-400 dark:text-zinc-500">
                     Automatizadas
                   </p>
                 </div>

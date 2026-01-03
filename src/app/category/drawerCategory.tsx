@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/me/select";
 import { toast } from "sonner";
+import { Tag, ArrowUpCircle, ArrowDownCircle, PackagePlus, RefreshCcw } from "lucide-react";
 
 interface Props {
   show: boolean;
@@ -37,7 +38,7 @@ export default function DrawerCategory({
 }: Props) {
   const { data: session } = useSession();
   const categoryService = new CategoryService();
-  const [error, setError] = useState<string>("");
+  const [, setError] = useState<string>("");
   const [form, setForm] = useState<StoreCategory>({
     name: "",
     typeId: 1,
@@ -45,7 +46,9 @@ export default function DrawerCategory({
   });
 
   useEffect(() => {
-    setForm(data);
+    if (data) {
+      setForm(data);
+    }
   }, [data]);
 
   const saveCategory = async () => {
@@ -62,138 +65,132 @@ export default function DrawerCategory({
       } else {
         result = await categoryService.postCategory(form, session?.user?.token);
       }
-      // console.log(result);
 
       if (result.status !== 500 && result.status !== 400) {
-        if (result.status === 201) {
-          toast.success("Se ha registrado correctamente..");
-          clear();
-        } else if (result.status === 200) {
-          toast.success("Se ha guardado correctamente..");
-          close();
-        }
+        toast.success(data.id ? "Categoría actualizada" : "Categoría creada");
+        close();
       } else {
         toast.error("Error al registrar..");
       }
     } catch (error) {
       toast.error("Error al registrar..");
+      console.error(error);
     }
-  };
-
-  const clear = () => {
-    setForm({
-      name: "",
-      typeId: 1,
-      status: true,
-    });
-    setError("");
   };
 
   const close = () => {
     onUpdate();
     onClose();
-    clear();
   };
 
   return (
-    <Drawer open={show} onOpenChange={close}>
-      <DrawerContent>
+    <Drawer open={show} onOpenChange={onClose}>
+      <DrawerContent className="bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800">
         <div className="mx-auto w-full max-w-sm">
-          <DrawerHeader>
-            <DrawerTitle>
-              {data.id ? "Editar Categoria" : "Nueva Categoria"}
-            </DrawerTitle>
-            <DrawerDescription>
-              Aqui puedes agregar las categorias.
-            </DrawerDescription>
-          </DrawerHeader>
-          <div className="p-8 pb-0">
-            <div className="flex flex-col gap-3 items-center justify-center space-x-2">
-              <div className="flex flex-col space-y-2 w-full">
-                <span className={error == "name" ? "text-amber-400" : ""}>
-                  Nombre
-                </span>
-                <Input
-                  value={form.name}
-                  onChange={(e) => {
-                    setForm({ ...form, name: e.target.value }), setError("");
-                  }}
-                  autoComplete="off"
-                  placeholder="Escribe el nombre"
-                />
+
+          <div className="flex items-center gap-1 mt-2 mx-2">
+            <div className="flex items-center p-3 rounded-2xl bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border border-zinc-500/20">
+              {data.id ? <RefreshCcw className="w-5 h-5" /> : <PackagePlus className="w-5 h-5" />}
+            </div>
+
+            <DrawerHeader className="pb-2 text-left -space-y-1.5">
+              <div className="flex items-center justify-between">
+                <DrawerTitle className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+                  {data.id ? "Editar Categoría" : "Nueva Categoría"}
+                </DrawerTitle>
               </div>
-              <div className="flex flex-col space-y-2 w-full">
-                <span>Tipo</span>
+              <DrawerDescription className="text-zinc-500 dark:text-zinc-400">
+                {data.id
+                  ? "Modifica los detalles de tu categoría."
+                  : "Crea una nueva clasificación para tus finanzas."}
+              </DrawerDescription>
+            </DrawerHeader>
+          </div>
+
+          <div className="p-4 pt-2 space-y-4">
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Nombre</label>
+                <div className="relative">
+                  <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                  <Input
+                    autoFocus
+                    value={form.name}
+                    onChange={(e) => {
+                      setForm({ ...form, name: e.target.value }), setError("");
+                    }}
+                    autoComplete="off"
+                    placeholder="Ej. Alimentación, Sueldo..."
+                    className="pl-10 h-11"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Tipo de Movimiento</label>
                 <Select
                   value={form.typeId?.toString()}
-                  onValueChange={(e) => {
-                    setForm({
-                      ...form,
-                      typeId: parseInt(e),
-                    }),
-                      setError("");
-                  }}
+                  onValueChange={(val) => setForm({ ...form, typeId: parseInt(val) })}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccione" />
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Seleccionar tipo" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
                     <SelectGroup>
-                      <SelectItem key={1} value={(1).toString()}>
-                        Ingreso
+                      <SelectItem value="1">
+                        <div className="flex items-center gap-2">
+                          <ArrowUpCircle className="w-4 h-4 text-emerald-500" />
+                          <span>Ingreso</span>
+                        </div>
                       </SelectItem>
-                      <SelectItem key={2} value={(2).toString()}>
-                        Gasto
+                      <SelectItem value="2">
+                        <div className="flex items-center gap-2">
+                          <ArrowDownCircle className="w-4 h-4 text-rose-500" />
+                          <span>Gasto</span>
+                        </div>
                       </SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex flex-col space-y-2 w-full mt-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <input
-                      id="custom-checkbox"
-                      type="checkbox"
-                      checked={form.status}
-                      onChange={(e) => {
-                        setForm({
-                          ...form,
-                          status: e.target.checked,
-                        });
-                      }}
-                      className="w-4.5 h-4.5 rounded bg-gray-500 border-gray-300  dark:bg-zinc-100 dark:border-zinc-600  cursor-pointer"
-                    />
-                    <label
-                      htmlFor="custom-checkbox"
-                      className="ml-1 text-sm font-xs text-zinc-700 dark:text-gray-300 cursor-pointer opacity-90"
-                    >
-                      {form.status ? "Activo" : "Inactivo"}
-                    </label>
-                  </div>
+
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800">
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">Estado de Categoría</span>
+                  <span className="text-[10px] text-zinc-500">¿Esta categoría está disponible?</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-[10px] font-black uppercase ${form.status ? 'text-emerald-500' : 'text-zinc-400'}`}>
+                    {form.status ? "Activa" : "Inactiva"}
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={form.status}
+                    onChange={(e) => setForm({ ...form, status: e.target.checked })}
+                    className="w-5 h-5 rounded-lg border-2 border-zinc-200 dark:border-zinc-800 accent-zinc-900 dark:accent-zinc-100 cursor-pointer"
+                  />
                 </div>
               </div>
             </div>
-            <DrawerFooter className="mt-2">
-              <hr />
-              <div className="flex items-center justify-center gap-4 mt-4">
-                <div
-                  onClick={close}
-                  className="flex items-center gap-1 justify-center text-zinc-800 hover:bg-zinc-100/50 active:bg-zinc-100/50 dark:text-white hover:dark:bg-zinc-800/70 active:dark:bg-zinc-900/20 active:scale-90 cursor-pointer duration-200 rounded-xl py-2 px-6"
-                >
-                  Cancelar
-                </div>
-
-                <div
-                  onClick={saveCategory}
-                  className="flex items-center gap-1 justify-center font-medium text-white bg-zinc-800 active:bg-zinc-800/70 dark:text-zinc-800 dark:bg-zinc-100 active:dark:bg-zinc-200/80 active:scale-90 cursor-pointer duration-200 rounded-xl py-2 px-8"
-                >
-                  Guardar
-                </div>
-              </div>
-              {/* <pre>{JSON.stringify(form, null, 2)}</pre> */}
-            </DrawerFooter>
           </div>
+
+          <DrawerFooter className="px-6 pb-8 mt-2">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={onClose}
+                className="flex-1 h-12 rounded-xl font-bold text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all active:scale-95"
+              >
+                Cancelar
+              </button>
+
+              <button
+                onClick={saveCategory}
+                className="flex-[2] h-12 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-bold shadow-lg shadow-zinc-900/10 dark:shadow-none transition-all active:scale-[0.98] hover:opacity-90"
+              >
+                {data.id ? "Actualizar" : "Crear Categoría"}
+              </button>
+            </div>
+          </DrawerFooter>
         </div>
       </DrawerContent>
     </Drawer>

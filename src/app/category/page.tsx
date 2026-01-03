@@ -1,37 +1,52 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { CategoryService } from "./services/api";
-import { motion, Variants } from "framer-motion";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/me/Table";
-import { Input } from "@/components/me/input";
-import JIcon from "@/components/me/jicon";
-import { useEffect, useState, useCallback } from "react";
+import { motion, AnimatePresence, Variants } from "framer-motion";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { GetCategory, StoreCategory } from "./interfaces";
 import DrawerCategory from "./drawerCategory";
+import {
+  Plus,
+  Search,
+  ChevronRight,
+  MoreVertical,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  Hash
+} from "lucide-react";
+
+const containerVariants: Variants = {
+  animate: {
+    transition: {
+      staggerChildren: 0.05
+    }
+  }
+};
 
 const itemVariants: Variants = {
-  initial: { opacity: 0, y: 50 },
+  initial: { opacity: 0, y: 15, filter: "blur(4px)" },
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.3, ease: "easeInOut" },
+    filter: "blur(0px)",
+    transition: { duration: 0.5, ease: [0.25, 1, 0.5, 1] },
   },
+  exit: {
+    opacity: 0,
+    scale: 0.95,
+    filter: "blur(8px)",
+    transition: { duration: 0.3 }
+  }
 };
 
 export default function Category() {
   const { data: session, status } = useSession();
-  const categoryService = new CategoryService();
-  const [category, setCategories] = useState<GetCategory[]>([]);
+  const categoryService = useMemo(() => new CategoryService(), []);
+  const [categories, setCategories] = useState<GetCategory[]>([]);
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState("")
+  const [search, setSearch] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   const [dataCategory, setDataCategory] = useState<StoreCategory>({
     name: "",
@@ -40,23 +55,21 @@ export default function Category() {
   });
 
   const getCategories = useCallback(async () => {
-    if (!session?.user?.token) return;
+    if (status !== "authenticated" || !session?.user?.token) return;
     try {
       setLoading(true);
-      setCategories([]);
       const response = await categoryService.getCategories(session.user.token);
-      // console.log(response);
-
-      if (response.status === 200) {
-        setCategories(response.data);
-        setTimeout(() => {
-          setLoading(false);
-        }, 300);
+      if (response && response.status === 200) {
+        const data = Array.isArray(response.data) ? response.data : [];
+        console.log(data);
+        setCategories(data);
       }
     } catch (error) {
       console.error("Error al obtener las categorías:", error);
+    } finally {
+      setLoading(false);
     }
-  }, [session?.user?.token]);
+  }, [session?.user?.token, status, categoryService]);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -64,20 +77,12 @@ export default function Category() {
     }
   }, [getCategories, status]);
 
-  if (status === "loading") {
-    return (
-      <div className="loading-page bg-white dark:bg-[#0a0911]">
-        <span className="loader" />
-      </div>
-    );
-  }
-
-  const editCategory = (category: GetCategory) => {
+  const editCategory = (cat: GetCategory) => {
     setDataCategory({
-      id: category.id,
-      name: category.name,
-      typeId: category.type,
-      status: category.status,
+      id: cat.id,
+      name: cat.name,
+      typeId: cat.type,
+      status: cat.status,
     });
     setShow(true);
   };
@@ -91,121 +96,198 @@ export default function Category() {
     setShow(true);
   };
 
-  return (
-    <div className="h-screen w-full max-w-xl mx-auto overflow-x-hidden overflow-y-scroll scrollbar dark:scrollbar-dark">
-      <main className="items-center mt-20">
+  // const filteredCategories = useMemo(() => {
+  //   return (categories || []).filter(cat =>
+  //     cat.name?.toLowerCase().includes(search.toLowerCase())
+  //   );
+  // }, [categories, search]);
 
-        <div className="flex gap-3 justify-between max-w-2xl mb-10 mt-3 px-8 select-none">
-          <div className="text-xl font-semibold">Categorias</div>
-          <div className="flex gap-2">
-
-            <Input
-              className="h-7 text-xs"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value)
-              }}
-              autoComplete="off"
-              placeholder="Buscar..."
-            />
-
-            <div
-              className="flex items-center w-[120px] justify-center text-green-500 hover:bg-green-100/50 active:bg-green-100/50
-            hover:dark:bg-green-900/20 active:dark:bg-green-900/20 
-            active:scale-90 duration-200 rounded-xl py-1 px-3 cursor-pointer"
-              onClick={newCategory}
-            >
-              + Nuevo
-            </div>
-          </div>
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center h-screen bg-white dark:bg-zinc-950">
+        <div className="relative">
+          <div className="w-12 h-12 rounded-full border-2 border-zinc-100 dark:border-zinc-800" />
+          <div className="absolute inset-0 w-12 h-12 rounded-full border-t-2 border-zinc-900 dark:border-zinc-100 animate-spin" />
         </div>
+      </div>
+    );
+  }
 
+  return (
+    <div className="min-h-screen bg-[#fafafa] dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans selection:bg-zinc-200 dark:selection:bg-zinc-800">
+      <div className="bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-200/50 dark:border-zinc-800/50 pt-16 pb-4">
+        <div className="max-w-lg mx-auto px-4">
+          <AnimatePresence mode="wait">
+            {!isSearching ? (
+              <motion.div
+                key="default-header"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="flex items-center justify-between"
+              >
+                <div className="flex flex-col -space-y-1">
+                  <h1 className="text-2xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
+                    Categorías
+                  </h1>
+                  <p className="text-[10px] font-black text-zinc-400 dark:text-zinc-500">
+                    Gestiona tus tipos de transacciones
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsSearching(true)}
+                    className="w-9 h-9 flex items-center justify-center bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all active:scale-95"
+                  >
+                    <Search className="w-4.5 h-4.5" strokeWidth={2.5} />
+                  </button>
+
+                  <button
+                    onClick={newCategory}
+                    className="group relative flex items-center gap-2 px-3.5 h-9 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl shadow-xl shadow-zinc-900/10 dark:shadow-none active:scale-[0.98] transition-all hover:opacity-90 overflow-hidden"
+                  >
+                    <Plus className="w-4 h-4" strokeWidth={3} />
+                    <span className="text-xs font-bold">Nuevo</span>
+                  </button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="search-header"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="flex items-center gap-3"
+              >
+                <div className="relative flex-1">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                  <input
+                    autoFocus
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Buscar categorías..."
+                    className="w-full h-11 pl-10 pr-4 bg-zinc-100 dark:bg-zinc-900/80 border border-transparent focus:border-zinc-900/10 dark:focus:border-zinc-100/10 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-xs font-bold transition-all outline-none"
+                  />
+                </div>
+                <button
+                  onClick={() => {
+                    setIsSearching(false);
+                    setSearch("");
+                  }}
+                  className="px-3 h-11 text-xs font-black text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100 transition-colors"
+                >
+                  Cancelar
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      <main className="max-w-xl mx-auto px-6 py-6 overflow-hidden overflow-y-auto h-[calc(100vh-16rem)]">
         <motion.div
-          variants={itemVariants}
+          variants={containerVariants}
           initial="initial"
           animate="animate"
-          className="flex justify-center overflow-auto h-[70dvh]"
+          className="grid gap-3"
         >
-          <div className="flex items-center justify-center">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>#</TableHead>
-                  <TableHead className="w-24">Tipo</TableHead>
-                  <TableHead className="w-56">Nombre</TableHead>
-                  <TableHead>Creado</TableHead>
-                  <TableHead className="w-10"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center">
-                      Cargando...
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  category.map((item, index) => (
-                    <TableRow key={item.id} className="group">
-                      <TableCell>{index}</TableCell>
-                      <TableCell
-                        className={
-                          item.type == 1 ? "text-green-500" : "text-red-500"
-                        }
-                      >
-                        {item.type == 1 ? "+ Ingreso" : "- Gasto"}
-                      </TableCell>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>{item.createdAt}</TableCell>
-                      <TableCell>
-                        <div
-                          className="block md:hidden group-hover:block cursor-pointer active:scale-90 duration-200"
-                          onClick={() => editCategory(item)}
-                        >
-                          <JIcon name="edit" width="w-5" />
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )))}
+          {/* <pre>{JSON.stringify(categories, null, 2)}</pre> */}
+          <AnimatePresence mode="popLayout" initial={false}>
+            {loading ? (
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="py-20 flex flex-col items-center justify-center gap-4 opacity-50"
+              >
+                <div className="w-6 h-6 border-2 border-zinc-900 dark:border-zinc-100 border-t-transparent rounded-full animate-spin" />
+                <span className="text-xs font-bold uppercase tracking-widest">Cargando datos</span>
+              </motion.div>
+            ) :
+              categories.map((cat) => (
+                <div
+                  key={cat.id}
+                  onClick={() => editCategory(cat)}
+                  className="group relative bg-white dark:bg-zinc-900/40 border border-zinc-200/50 dark:border-zinc-800/50 p-3 rounded-[20px] transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800/60 active:scale-[0.99] cursor-pointer shadow-sm"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="shrink-0">
+                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center border shadow-sm ${cat.type === 1
+                        ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                        : 'bg-rose-50 dark:bg-rose-500/10 border-rose-100 dark:border-rose-500/20 text-rose-600 dark:text-rose-400'
+                        }`}>
+                        {cat.type === 1 ? <ArrowUpCircle className="w-6 h-6" /> : <ArrowDownCircle className="w-6 h-6" />}
+                      </div>
+                    </div>
 
-                {!loading && category.length == 0 && (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center opacity-10">
-                      <span className="flex items-center justify-center mt-2">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="3em"
-                          height="3em"
-                          viewBox="0 0 24 24"
-                        >
-                          <g
-                            fill="none"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="1.5"
-                            color="currentColor"
-                          >
-                            <path d="m12.88 7.017l4.774 1.271m-5.796 2.525l2.386.636m-2.267 6.517l.954.255c2.7.72 4.05 1.079 5.114.468c1.063-.61 1.425-1.953 2.148-4.637l1.023-3.797c.724-2.685 1.085-4.027.471-5.085s-1.963-1.417-4.664-2.136l-.954-.255c-2.7-.72-4.05-1.079-5.113-.468c-1.064.61-1.426 1.953-2.15 4.637l-1.022 3.797c-.724 2.685-1.086 4.027-.471 5.085c.614 1.057 1.964 1.417 4.664 2.136" />
-                            <path d="m12 20.946l-.952.26c-2.694.733-4.04 1.1-5.102.477c-1.06-.622-1.422-1.99-2.143-4.728l-1.021-3.872c-.722-2.737-1.083-4.106-.47-5.184C2.842 6.966 4 7 5.5 7" />
-                          </g>
-                        </svg>
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <h3 className="text-[15px] font-bold text-zinc-900 dark:text-zinc-50 truncate">
+                              {cat.name}
+                            </h3>
+                            <span className={`shrink-0 text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md border ${cat.type === 1
+                              ? 'bg-emerald-50/50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100/50 dark:border-emerald-500/10'
+                              : 'bg-rose-50/50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-100/50 dark:border-rose-500/10'
+                              }`}>
+                              {cat.type === 1 ? 'Ingreso' : 'Gasto'}
+                            </span>
+                          </div>
+                          <MoreVertical className="shrink-0 w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-400 transition-colors" />
+                        </div>
+                        <div className="flex items-center gap-3 mt-0.5">
+                          <p className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500">
+                            {cat.createdAt}
+                          </p>
+                          {!cat.status && (
+                            <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-500 border border-zinc-200/50 dark:border-zinc-700/50">
+                              Inactivo
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                      <ChevronRight className="w-4 h-4 text-zinc-400" strokeWidth={2.5} />
+                    </div>
+                  </div>
+                </div>
+
+              ))}
+          </AnimatePresence>
         </motion.div>
       </main>
 
-      <DrawerCategory
-        show={show}
-        onClose={() => setShow(!show)}
-        onUpdate={getCategories}
-        data={dataCategory}
-      />
+      {show && (
+        <DrawerCategory
+          show={show}
+          onClose={() => setShow(false)}
+          onUpdate={getCategories}
+          data={dataCategory}
+        />
+      )}
     </div>
   );
 }
+
+// ) : (
+//   <motion.div
+//     key="empty"
+//     initial={{ opacity: 0 }}
+//     animate={{ opacity: 1 }}
+//     exit={{ opacity: 0 }}
+//     className="py-20 text-center"
+//   >
+//     <div className="inline-flex items-center justify-center w-16 h-16 rounded-[24px] bg-zinc-100 dark:bg-zinc-900 mb-6">
+//       <Hash className="w-7 h-7 text-zinc-400" />
+//     </div>
+//     <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-1">Sin categorías</h3>
+//     <p className="text-zinc-500 dark:text-zinc-500 max-w-[200px] mx-auto text-xs font-medium">
+//       {search ? "No se encontraron categorías con ese nombre." : "Comienza por añadir una nueva categoría para tus movimientos."}
+//     </p>
+//   </motion.div>
+// )}

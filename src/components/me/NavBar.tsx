@@ -177,9 +177,37 @@ export function NavBar() {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center cursor-pointer p-1 rounded-md hover:bg-gray-100/50 hover:dark:bg-zinc-700/70 active:scale-90 duration-200">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-zinc-500 dark:text-zinc-400" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeWidth={1.5}><path d="M18.75 9.71v-.705C18.75 5.136 15.726 2 12 2S5.25 5.136 5.25 9.005v.705a4.4 4.4 0 0 1-.692 2.375L3.45 13.81c-1.011 1.575-.239 3.716 1.52 4.214a25.8 25.8 0 0 0 14.06 0c1.759-.498 2.531-2.639 1.52-4.213l-1.108-1.725a4.4 4.4 0 0 1-.693-2.375Z"></path><path strokeLinecap="round" d="M7.5 19c.655 1.748 2.422 3 4.5 3s3.845-1.252 4.5-3"></path></g></svg>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="flex items-center cursor-pointer p-1 rounded-md hover:bg-gray-100/50 hover:dark:bg-zinc-700/70 active:scale-90 duration-200">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-zinc-500 dark:text-zinc-400" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeWidth={1.5}><path d="M18.75 9.71v-.705C18.75 5.136 15.726 2 12 2S5.25 5.136 5.25 9.005v.705a4.4 4.4 0 0 1-.692 2.375L3.45 13.81c-1.011 1.575-.239 3.716 1.52 4.214a25.8 25.8 0 0 0 14.06 0c1.759-.498 2.531-2.639 1.52-4.213l-1.108-1.725a4.4 4.4 0 0 1-.693-2.375Z"></path><path strokeLinecap="round" d="M7.5 19c.655 1.748 2.422 3 4.5 3s3.845-1.252 4.5-3"></path></g></svg>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-44"
+                align="end"
+                sideOffset={14}
+                alignOffset={-47}
+              >
+                <DropdownMenuGroup className="flex flex-col gap-2 overflow-y-auto h-48">
+                  {/* {10 > 0 ? (
+                    Array.from({ length: 10 }).map((_, index) => (
+                      <DropdownMenuItem key={index}>
+                        <div>
+                          <p>Notification {index}</p>
+                          <p>Notification {index}</p>
+                          <p>Notification {index}</p>
+                          <p>Notification {index}</p>
+                          <p>Notification {index}</p>
+                        </div>
+                      </DropdownMenuItem>
+                    ))
+                  ) : (
+                  )} */}
+                  <p className="text-center text-sm opacity-50 mt-20">Sin notificaciones</p>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -197,8 +225,8 @@ export function NavBar() {
                   <DropdownMenuItem
                     className={
                       pathname == "/"
-                        ? "font-semibold dark:text-zinc-200"
-                        : "hover:font-semibold hover:dark:text-zinc-200"
+                        ? "font-semibold dark:text-zinc-200 cursor-pointer"
+                        : "hover:font-semibold dark:text-zinc-400 hover:dark:text-zinc-200 cursor-pointer"
                     }
                     onClick={() => {
                       router.push("/");
@@ -213,8 +241,8 @@ export function NavBar() {
                   <DropdownMenuItem
                     className={
                       pathname == "/tasks"
-                        ? "font-semibold dark:text-zinc-200"
-                        : "hover:font-semibold hover:dark:text-zinc-200"
+                        ? "font-semibold dark:text-zinc-200 cursor-pointer"
+                        : "hover:font-semibold dark:text-zinc-400 hover:dark:text-zinc-200 cursor-pointer"
                     }
                     onClick={() => {
                       router.push("/tasks");
@@ -229,8 +257,8 @@ export function NavBar() {
                   <DropdownMenuItem
                     className={
                       pathname == "/graphics"
-                        ? "font-semibold dark:text-zinc-200"
-                        : "hover:font-semibold hover:dark:text-zinc-200"
+                        ? "font-semibold dark:text-zinc-200 cursor-pointer"
+                        : "hover:font-semibold dark:text-zinc-400 hover:dark:text-zinc-200 cursor-pointer"
                     }
                     onClick={() => {
                       router.push("/graphics");
@@ -245,8 +273,8 @@ export function NavBar() {
                   <DropdownMenuItem
                     className={
                       pathname == "/category"
-                        ? "font-semibold dark:text-zinc-200"
-                        : "hover:font-semibold hover:dark:text-zinc-200"
+                        ? "font-semibold dark:text-zinc-200 cursor-pointer"
+                        : "hover:font-semibold dark:text-zinc-400 hover:dark:text-zinc-200 cursor-pointer"
                     }
                     onClick={() => {
                       router.push("/category");
@@ -257,6 +285,27 @@ export function NavBar() {
                     </div>
                     <span className="text-xs ml-1">Categorias</span>
                   </DropdownMenuItem>
+
+                  {session.user.user.role === "admin" && (
+                    <>
+                      <hr className="my-1" />
+                      <DropdownMenuItem
+                        className={
+                          pathname == "/users"
+                            ? "font-semibold dark:text-zinc-200 cursor-pointer"
+                            : "hover:font-semibold dark:text-zinc-400 hover:dark:text-zinc-200 cursor-pointer"
+                        }
+                        onClick={() => {
+                          router.push("/users");
+                        }}
+                      >
+                        <div className="w-3.5 h-3.5 opacity-60">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 19.75c0-2.09-1.67-5.068-4-5.727m-2 5.727c0-2.651-2.686-6-6-6s-6 3.349-6 6m9-12.5a3 3 0 1 1-6 0a3 3 0 0 1 6 0m3 3a3 3 0 1 0 0-6"></path></svg>
+                        </div>
+                        <span className="text-xs ml-1">Usuarios</span>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
