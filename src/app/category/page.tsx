@@ -96,11 +96,11 @@ export default function Category() {
     setShow(true);
   };
 
-  // const filteredCategories = useMemo(() => {
-  //   return (categories || []).filter(cat =>
-  //     cat.name?.toLowerCase().includes(search.toLowerCase())
-  //   );
-  // }, [categories, search]);
+  const filteredCategories = useMemo(() => {
+    return (categories || []).filter(cat =>
+      cat.name?.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [categories, search]);
 
   if (status === "loading") {
     return (
@@ -186,14 +186,13 @@ export default function Category() {
         </div>
       </div>
 
-      <main className="max-w-xl mx-auto px-6 py-6 overflow-hidden overflow-y-auto h-[calc(100vh-16rem)]">
+      <main className="max-w-xl mx-auto px-6 py-3 overflow-hidden overflow-y-auto h-[calc(100vh-16rem)]">
         <motion.div
           variants={containerVariants}
           initial="initial"
           animate="animate"
           className="grid gap-3"
         >
-          {/* <pre>{JSON.stringify(categories, null, 2)}</pre> */}
           <AnimatePresence mode="popLayout" initial={false}>
             {loading ? (
               <motion.div
@@ -207,11 +206,11 @@ export default function Category() {
                 <span className="text-xs font-bold uppercase tracking-widest">Cargando datos</span>
               </motion.div>
             ) :
-              categories.map((cat) => (
+              filteredCategories.map((cat) => (
                 <div
                   key={cat.id}
                   onClick={() => editCategory(cat)}
-                  className="group relative bg-white dark:bg-zinc-900/40 border border-zinc-200/50 dark:border-zinc-800/50 p-3 rounded-[20px] transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800/60 active:scale-[0.99] cursor-pointer shadow-sm"
+                  className="group relative bg-white dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 p-3 rounded-[20px] transition-all hover:bg-zinc-50 dark:hover:bg-zinc-900 active:scale-[0.99] cursor-pointer hover:shadow"
                 >
                   <div className="flex items-center gap-3">
                     <div className="shrink-0">
@@ -237,7 +236,6 @@ export default function Category() {
                               {cat.type === 1 ? 'Ingreso' : 'Gasto'}
                             </span>
                           </div>
-                          <MoreVertical className="shrink-0 w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-400 transition-colors" />
                         </div>
                         <div className="flex items-center gap-3 mt-0.5">
                           <p className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500">
@@ -273,21 +271,3 @@ export default function Category() {
     </div>
   );
 }
-
-// ) : (
-//   <motion.div
-//     key="empty"
-//     initial={{ opacity: 0 }}
-//     animate={{ opacity: 1 }}
-//     exit={{ opacity: 0 }}
-//     className="py-20 text-center"
-//   >
-//     <div className="inline-flex items-center justify-center w-16 h-16 rounded-[24px] bg-zinc-100 dark:bg-zinc-900 mb-6">
-//       <Hash className="w-7 h-7 text-zinc-400" />
-//     </div>
-//     <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-1">Sin categorías</h3>
-//     <p className="text-zinc-500 dark:text-zinc-500 max-w-[200px] mx-auto text-xs font-medium">
-//       {search ? "No se encontraron categorías con ese nombre." : "Comienza por añadir una nueva categoría para tus movimientos."}
-//     </p>
-//   </motion.div>
-// )}

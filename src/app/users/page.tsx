@@ -208,7 +208,7 @@ export default function UsersPage() {
         </div>
       </div>
 
-      <main className="max-w-xl mx-auto px-6 py-6 pb-32">
+      <main className="max-w-xl mx-auto px-6 py-3 pb-32">
         <motion.div
           variants={containerVariants}
           initial="initial"
@@ -227,7 +227,7 @@ export default function UsersPage() {
                   variants={itemVariants}
                   layout
                   onClick={() => editUser(user)}
-                  className="group relative bg-white dark:bg-zinc-900/40 border border-zinc-200/50 dark:border-zinc-800/50 p-2.5 rounded-[20px] transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800/60 active:scale-[0.99] cursor-pointer shadow-sm"
+                  className="group relative bg-white dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 p-2.5 rounded-[20px] transition-all hover:bg-zinc-50 dark:hover:bg-zinc-900 active:scale-[0.99] cursor-pointer hover:shadow"
                 >
                   <div className="flex items-center gap-3">
                     <div className="relative shrink-0">

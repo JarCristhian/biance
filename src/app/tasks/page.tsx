@@ -299,7 +299,7 @@ export default function TasksPage() {
         </div>
       </div>
 
-      <main className="max-w-xl mx-auto md:px-6 px-4 py-4 pb-6 overflow-y-auto h-[calc(100vh-10rem)]">
+      <main className="max-w-xl mx-auto md:px-6 px-4 py-3 pb-6 overflow-y-auto h-[calc(100vh-10rem)]">
         <motion.div
           variants={containerVariants}
           initial="initial"
@@ -379,15 +379,6 @@ export default function TasksPage() {
           </AnimatePresence>
         </motion.div>
       </main>
-
-      {/* {tasks.length > 5 && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-20">
-          <div className="bg-zinc-900 dark:bg-zinc-50 text-white dark:text-zinc-900 px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 text-sm font-bold">
-            <ArrowUpRight className="w-4 h-4" />
-            <span>Desliza para ver más</span>
-          </div>
-        </div>
-      )} */}
 
       {showDrawer && selectedTask && (
         <DrawerTask
