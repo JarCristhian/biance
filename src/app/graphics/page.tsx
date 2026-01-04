@@ -20,6 +20,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import { TrendingUp } from "lucide-react";
+import { redirect } from "next/navigation";
 
 // import { GetCategory, StoreCategory } from "./interfaces";
 // import DrawerCategory from "./drawerCategory";
@@ -35,7 +36,7 @@ const itemVariants: Variants = {
 
 
 
-  const chartData = [
+const chartData = [
   { month: "January", desktop: 186 },
   { month: "February", desktop: 305 },
   { month: "March", desktop: 237 },
@@ -75,8 +76,8 @@ export default function Category() {
       // if (response.status === 200) {
       //   setCategories(response.data);
       //   setTimeout(() => {
-          //   setLoading(false);
-          // }, 300);
+      //   setLoading(false);
+      // }, 300);
       // }
     } catch (error) {
       console.error("Error al obtener las categorías:", error);
@@ -96,6 +97,8 @@ export default function Category() {
       </div>
     );
   }
+
+  if (!session) { return redirect("/login"); }
 
   const editCategory = (category: any) => {
     // setDataCategory({
@@ -137,58 +140,58 @@ export default function Category() {
           animate="animate"
           className="flex justify-center"
         >
-         <Card>
-      <CardHeader>
-        <CardTitle>Area Chart</CardTitle>
-        <CardDescription>
-          Showing total visitors for the last 6 months
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
-          <AreaChart
-            accessibilityLayer={true}
-            data={chartData}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
-            />
-            <Area
-              dataKey="desktop"
-              type="natural"
-              fill="var(--color-desktop)"
-              fillOpacity={0.4}
-              stroke="var(--color-desktop)"
-            />
-          </AreaChart>
-        </ChartContainer>
-      </CardContent>
-      <CardFooter>
-        <div className="flex w-full items-start gap-2 text-sm">
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 leading-none font-medium">
-              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-            </div>
-            <div className="text-muted-foreground flex items-center gap-2 leading-none">
-              January - June 2024
-            </div>
-          </div>
-        </div>
-      </CardFooter>
-    </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Area Chart</CardTitle>
+              <CardDescription>
+                Showing total visitors for the last 6 months
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig}>
+                <AreaChart
+                  accessibilityLayer={true}
+                  data={chartData}
+                  margin={{
+                    left: 12,
+                    right: 12,
+                  }}
+                >
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    tickFormatter={(value) => value.slice(0, 3)}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent indicator="line" />}
+                  />
+                  <Area
+                    dataKey="desktop"
+                    type="natural"
+                    fill="var(--color-desktop)"
+                    fillOpacity={0.4}
+                    stroke="var(--color-desktop)"
+                  />
+                </AreaChart>
+              </ChartContainer>
+            </CardContent>
+            <CardFooter>
+              <div className="flex w-full items-start gap-2 text-sm">
+                <div className="grid gap-2">
+                  <div className="flex items-center gap-2 leading-none font-medium">
+                    Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+                  </div>
+                  <div className="text-muted-foreground flex items-center gap-2 leading-none">
+                    January - June 2024
+                  </div>
+                </div>
+              </div>
+            </CardFooter>
+          </Card>
         </motion.div>
       </main>
 

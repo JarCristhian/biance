@@ -17,6 +17,7 @@ import {
   Circle,
   Ban,
 } from "lucide-react";
+import { redirect } from "next/navigation";
 
 const itemVariants: Variants = {
   initial: { opacity: 0, y: 15 },
@@ -202,6 +203,8 @@ export default function TasksPage() {
       </div>
     );
   }
+
+  if (!session) { return redirect("/login"); }
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans">

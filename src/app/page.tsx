@@ -8,7 +8,7 @@ import DrawerBiance from "./home/components/drawerBiance";
 import Weekdays from "./home/components/weekdays";
 import dayjs from "dayjs";
 import TotalsHeader from "./home/components/totalsHeader";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { StoreFinance } from "./home/interfaces";
 
 interface DateI {
@@ -19,7 +19,7 @@ interface DateI {
 
 export default function Home() {
   const router = useRouter();
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const [show, setShow] = useState(false);
   const [type, setType] = useState(0);
   const [dString, setDString] = useState<DateI>({
@@ -68,6 +68,8 @@ export default function Home() {
       </div>
     );
   }
+
+  if (!session) { return redirect("/login"); }
 
   return (
     <>

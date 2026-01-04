@@ -9,11 +9,11 @@ import {
   Plus,
   Search,
   ChevronRight,
-  MoreVertical,
   ArrowUpCircle,
   ArrowDownCircle,
-  Hash
+  PackagePlus,
 } from "lucide-react";
+import { redirect } from "next/navigation";
 
 const containerVariants: Variants = {
   animate: {
@@ -61,7 +61,7 @@ export default function Category() {
       const response = await categoryService.getCategories(session.user.token);
       if (response && response.status === 200) {
         const data = Array.isArray(response.data) ? response.data : [];
-        console.log(data);
+        // console.log(data);
         setCategories(data);
       }
     } catch (error) {
@@ -112,6 +112,8 @@ export default function Category() {
       </div>
     );
   }
+
+  if (!session) { return redirect("/login"); }
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans selection:bg-zinc-200 dark:selection:bg-zinc-800">
@@ -264,6 +266,23 @@ export default function Category() {
                 </div>
               ))}
           </AnimatePresence>
+
+          {filteredCategories.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="py-20 text-center"
+            >
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-[32px] bg-zinc-100 dark:bg-zinc-900 mb-6">
+                <PackagePlus className="w-8 h-8 text-zinc-400" />
+              </div>
+              <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">Sin categorías</h3>
+              <p className="text-zinc-500 dark:text-zinc-500 max-w-[240px] mx-auto text-sm font-medium">
+                Tu lista de categorías está vacía. Empieza por agregar una nueva categoría.
+              </p>
+            </motion.div>
+          )}
+
         </motion.div>
       </main>
 

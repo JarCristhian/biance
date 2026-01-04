@@ -116,7 +116,7 @@ export function NavBar() {
                   <hr className="my-1" />
                   <DropdownMenuItem
                     className="cursor-pointer text-sm"
-                    onClick={() => signOut()}
+                    onClick={() => signOut({ callbackUrl: "/login" })}
                   >
                     <div className="w-3 h-3">
                       <svg

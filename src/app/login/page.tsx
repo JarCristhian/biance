@@ -20,8 +20,7 @@ function Login() {
   const [password, setPassword] = useState<string>("");
   const [visible, setVisible] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
-  const [emailFocused, setEmailFocused] = useState<boolean>(false);
-  const [passwordFocused, setPasswordFocused] = useState<boolean>(false);
+  const [session, setSession] = useState<boolean>(false);
   const router = useRouter();
   const [lang, setLang] = useState<boolean | null>(false);
 
@@ -57,8 +56,8 @@ function Login() {
       toast.error("Tu Usuario es incorrecto.");
       return;
     } else {
-      toast.success("Login Successfully!");
       router.push("/");
+      setSession(true);
     }
   };
 
@@ -280,7 +279,7 @@ function Login() {
                   disabled={loading}
                   className="cyber-btn"
                 >
-                  {loading ? "PENDING..." : (lang ? "INITIALIZE" : "INICIAR")}
+                  {session ? "SUCCESS " : loading ? "PENDING..." : (lang ? "INITIALIZE" : "INICIAR")}
                 </button>
               </form>
 

@@ -6,6 +6,7 @@ import { motion, AnimatePresence, Variants } from "framer-motion";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import DrawerUser from "./drawerUser";
 import { GetUser, StoreUser } from "./interfaces";
+import { redirect } from "next/navigation";
 
 import {
   Plus,
@@ -51,6 +52,7 @@ export default function UsersPage() {
   const [search, setSearch] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
+
   const [dataUser, setDataUser] = useState<StoreUser>({
     id: 0,
     name: "",
@@ -68,7 +70,7 @@ export default function UsersPage() {
       const response = await userService.getUsers(session.user.token);
       if (response && response.status === 200) {
         const data = Array.isArray(response.data) ? response.data : [];
-        console.log(data);
+        // console.log(data);
         setUsers(data);
       }
     } catch (error) {
@@ -135,6 +137,8 @@ export default function UsersPage() {
       </div>
     );
   }
+
+  if (!session) { return redirect("/login"); }
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans selection:bg-zinc-200 dark:selection:bg-zinc-800">
