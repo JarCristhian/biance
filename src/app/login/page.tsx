@@ -57,6 +57,7 @@ function Login() {
       return;
     } else {
       router.push("/");
+      toast.success("Bienvenido a Biance.");
       setSession(true);
     }
   };

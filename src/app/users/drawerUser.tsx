@@ -105,18 +105,18 @@ export default function DrawerUser({
           <div className="p-4 pt-2 space-y-4">
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Nombre Completo</label>
+                <label className={`text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1`}>Nombre Completo</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                   <Input
                     autoFocus
                     value={form.name}
+                    className={`pl-10 ${error === 'name' ? 'border-yellow-500' : ' '}`}
                     onChange={(e) => {
                       setForm({ ...form, name: e.target.value }), setError("");
                     }}
                     autoComplete="off"
                     placeholder="Ej. John Doe"
-                    className="pl-10"
                   />
                 </div>
               </div>
