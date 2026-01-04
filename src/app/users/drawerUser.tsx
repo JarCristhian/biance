@@ -1,5 +1,5 @@
 "use client";
-// import { TaskService } from "./services/api";
+import { UserService } from "./services/api";
 import { useEffect, useState } from "react";
 import { StoreUser } from "./interfaces";
 import { useSession } from "next-auth/react";
@@ -38,19 +38,17 @@ export default function DrawerUser({
 }: Props) {
   const { data: session } = useSession();
   const [error, setError] = useState<string>("");
+  const userService = new UserService();
   const [form, setForm] = useState<StoreUser>({
     name: "",
     email: "",
     password: "",
     image: "",
     role: "user",
+    status: true,
   });
 
-  useEffect(() => {
-    if (data) {
-      setForm(data);
-    }
-  }, [data]);
+  useEffect(() => { if (data) { setForm(data) } }, [data]);
 
   const saveUser = async () => {
     if (!form.name) return setError("name"), toast.info("Ingrese el nombre");
@@ -58,10 +56,19 @@ export default function DrawerUser({
     if (!form.password && !data.id) return setError("password"), toast.info("Ingrese la contraseña");
     if (!form.role) return setError("role"), toast.info("Ingrese el rol");
 
-    onUpdate({
-      ...form,
-      id: data.id
-    });
+    try {
+      if (data.id) {
+        await userService.updateUser(data.id, form, session?.user.token);
+      } else {
+        await userService.postUser(form, session?.user.token);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Error al guardar el usuario");
+      return;
+    }
+
+    onUpdate({ ...form, id: data.id });
 
     toast.success(data.id ? "Usuario actualizado" : "Usuario creado");
     close();
@@ -90,7 +97,7 @@ export default function DrawerUser({
               <DrawerDescription className="text-zinc-500 dark:text-zinc-400">
                 {data.id
                   ? "Actualiza la información del perfil del usuario."
-                  : "Completa los detalles para crear un nuevo usuario."}
+                  : "Completa los detalles para crearlo."}
               </DrawerDescription>
             </DrawerHeader>
           </div>
@@ -171,6 +178,26 @@ export default function DrawerUser({
                     placeholder="https://..."
                     className="pl-10"
                   />
+                </div>
+              </div>
+
+              <div className={`${data.id ? "" : "opacity-0 hidden"}`}>
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800">
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">Estado de Usuario</span>
+                    <span className="text-[10px] text-zinc-500">¿Esta usuario está disponible?</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-black uppercase ${form.status ? 'text-emerald-500' : 'text-zinc-400'}`}>
+                      {form.status ? "Activo" : "Inactivo"}
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={form.status}
+                      onChange={(e) => setForm({ ...form, status: e.target.checked })}
+                      className="w-5 h-5 rounded-lg border-2 border-zinc-200 dark:border-zinc-800 accent-zinc-900 dark:accent-zinc-100 cursor-pointer"
+                    />
+                  </div>
                 </div>
               </div>
             </div>

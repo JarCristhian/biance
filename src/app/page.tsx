@@ -9,6 +9,7 @@ import Weekdays from "./home/components/weekdays";
 import dayjs from "dayjs";
 import TotalsHeader from "./home/components/totalsHeader";
 import { useRouter } from "next/navigation";
+import { StoreFinance } from "./home/interfaces";
 
 interface DateI {
   year: number;
@@ -26,11 +27,39 @@ export default function Home() {
     month: dayjs().month().toString(),
     week: dayjs().isoWeek(),
   });
+  const [dataFinance, setDataFinance] = useState<StoreFinance>(
+    {
+      amount: "",
+      description: "",
+      paymentMethod: 1,
+      category: null,
+      date: dayjs().toDate(),
+      type: type,
+    }
+  );
 
-  const getType = (type: number) => {
+  const openNewFinance = (type: number) => {
     setType(type);
+    setDataFinance({
+      amount: "",
+      description: "",
+      paymentMethod: 1,
+      category: null,
+      date: dayjs().toDate(),
+      type,
+    });
     setShow(true);
   };
+
+  const openEditFinance = (finance: StoreFinance) => {
+    setType(finance.type);
+    setDataFinance(finance);
+    setShow(true);
+  };
+
+  if (status === "unauthenticated") {
+    router.push("/login");
+  }
 
   if (status === "loading") {
     return (
@@ -40,13 +69,9 @@ export default function Home() {
     );
   }
 
-  if (status === "unauthenticated") {
-    router.push("/login");
-  }
-
   return (
     <>
-      <Menu onOpen={getType} />
+      <Menu onOpen={openNewFinance} />
       <NavBar />
       <div className="h-screen w-full p-4 overflow-x-hidden overflow-y-scroll scrollbar dark:scrollbar-dark text-zinc-600 dark:text-zinc-200">
         <main className="items-center p-2 pt-14 md:px-16 w-full max-w-2xl mx-auto">
@@ -76,12 +101,13 @@ export default function Home() {
 
           <Weekdays setDString={setDString} />
 
-          <TableHome />
+          <TableHome setDataFinance={openEditFinance} />
         </main>
       </div>
       <DrawerBiance
         show={show}
         type={type}
+        data={dataFinance}
         onClose={() => setShow(!show)}
       />
     </>

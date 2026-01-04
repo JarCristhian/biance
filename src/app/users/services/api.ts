@@ -8,17 +8,17 @@ export interface Params {
   date?: string | null;
 }
 
-export class CategoryService {
-  async getCategories(token?: string) {
-    const result = await api.get("category", {
+export class UserService {
+  async getUsers(token?: string) {
+    const result = await api.get("users", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     return result;
   }
-  async postCategory(data: StoreUser, token?: string) {
-    const result = await api.post("category", data, {
+  async postUser(data: StoreUser, token?: string) {
+    const result = await api.post("users", data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,8 +27,8 @@ export class CategoryService {
 
     return result;
   }
-  async updateCategory(id: number, data: StoreUser, token?: string) {
-    const result = await api.patch(`category/${id}`, data, {
+  async updateUser(id: number, data: StoreUser, token?: string) {
+    const result = await api.patch(`users/${id}`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

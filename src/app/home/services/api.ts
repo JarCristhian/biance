@@ -28,6 +28,15 @@ export class FinanceService {
     return result;
   }
 
+  async updateFinances(id: number, data: StoreFinance, token?: string) {
+    const result = await api.patch(`finance/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return result;
+  }
+
   async getCategories(token?: string) {
     const result = await api.get("category/active", {
       headers: {

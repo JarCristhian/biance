@@ -12,8 +12,8 @@ export interface GetUser {
   password: string;
   image: string;
   role: string;
+  status: boolean;
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface StoreUser {
@@ -23,4 +23,5 @@ export interface StoreUser {
   password: string;
   image: string;
   role: string;
+  status: boolean;
 }

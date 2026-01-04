@@ -249,12 +249,19 @@ export default function Category() {
                         </div>
                       </div>
                     </div>
-                    <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
-                      <ChevronRight className="w-4 h-4 text-zinc-400" strokeWidth={2.5} />
+                    <div className="flex items-center gap-2">
+                      <div className="flex flex-col">
+                        <span className={`shrink-0 text-[8px] max-w-[70px] text-center font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md border ${cat.status ? 'bg-emerald-50/50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100/50 dark:border-emerald-500/10' : 'bg-red-50/50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-100/50 dark:border-red-500/10'}`}>
+                          {cat.status ? 'Activo' : 'Inactivo'}
+                        </span>
+                        <p className="text-[10px] opacity-40 text-zinc-900 dark:text-zinc-50">{cat.createdAt}</p>
+                      </div>
+                      <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                        <ChevronRight className="w-4 h-4 text-zinc-400" strokeWidth={2.5} />
+                      </div>
                     </div>
                   </div>
                 </div>
-
               ))}
           </AnimatePresence>
         </motion.div>

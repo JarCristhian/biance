@@ -7,10 +7,12 @@ export interface Props {
 export interface GetFinance {
   id: number;
   category: string;
+  description: string;
+  categoryId: number;
   income: number;
   expense: number;
   paymentMethod: string;
-  type: number;
+  paymentMethodId: number;
   hour: string;
 }
 
@@ -21,7 +23,7 @@ export interface StoreFinance {
   category: string | number | null;
   paymentMethod: number;
   date: Date;
-  type?: number;
+  type: number;
 }
 
 export interface GetCategory {

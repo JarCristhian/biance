@@ -1,7 +1,7 @@
 "use client";
 import { FinanceService } from "../services/api";
 import { useEffect, useState } from "react";
-import { GetFinance } from "../interfaces";
+import { GetFinance, StoreFinance } from "../interfaces";
 import { useSession } from "next-auth/react";
 import { motion, type Variants } from "framer-motion";
 import JIcon from "@/components/me/jicon";
@@ -25,7 +25,11 @@ const totalChilds: Variants = {
   },
 };
 
-export default function TableHome() {
+interface Props {
+  setDataFinance: (finance: StoreFinance) => void;
+}
+
+export default function TableHome({ setDataFinance }: Props) {
   const { data: session } = useSession();
   const financeService = new FinanceService();
   const [finance, setFinance] = useState<GetFinance[]>([]);
@@ -63,6 +67,20 @@ export default function TableHome() {
   useEffect(() => {
     getFinances();
   }, [daySelected, refreshFinance]);
+
+  const openEditFinance = (finance: GetFinance) => {
+    const dataFinance: StoreFinance = {
+      id: finance.id,
+      amount: finance.income > 0 ? finance.income.toString() : finance.expense.toString(),
+      description: finance.description,
+      category: finance.categoryId,
+      paymentMethod: finance.paymentMethodId,
+      date: new Date(),
+      type: finance.income > 0 ? 1 : 2,
+    };
+
+    setDataFinance(dataFinance);
+  };
 
   return (
     <motion.div
@@ -102,7 +120,7 @@ export default function TableHome() {
 
       <div className="flex flex-col items-center w-full sm:w-4/5 md:w-5/6 justify-center mt-6">
         <h3 className="text-xl font-semibold mb-2 opacity-85">
-          Transacciones del día  {finance.length ? `(${finance.length})` : ""}
+          Transacciones  {finance.length ? `(${finance.length})` : ""}
         </h3>
 
         <div className="flex flex-col items-center w-full overflow-y-scroll scrollbar dark:scrollbar-dark h-[30vh]">
@@ -110,7 +128,8 @@ export default function TableHome() {
           {finance.map((invoice, index) => (
             <div
               key={invoice.id}
-              className="w-full flex justify-between items-center py-2 px-4 border-b border-zinc-200/50 dark:border-zinc-900"
+              onClick={() => openEditFinance(invoice)}
+              className="w-full flex justify-between items-center py-2 px-4 border-b border-zinc-200/50 dark:border-zinc-900 hover:bg-zinc-200/50 dark:hover:bg-zinc-900 rounded-lg cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <div className="flex items-center rounded-full bg-zinc-200/50 dark:bg-zinc-800/70 w-9 h-9 justify-center mr-4">

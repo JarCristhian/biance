@@ -1,19 +1,21 @@
 "use client";
 import { useSession } from "next-auth/react";
+import { UserService } from "./services/api";
+
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import DrawerUser from "./drawerUser";
 import { GetUser, StoreUser } from "./interfaces";
 
 import {
   Plus,
   Search,
-  ChevronRight,
   ShieldCheck,
   User as UserIcon,
   Mail,
   MoreVertical,
-  UserPlus
+  UserPlus,
+  ChevronRight
 } from "lucide-react";
 
 const itemVariants: Variants = {
@@ -42,42 +44,69 @@ const containerVariants: Variants = {
 
 export default function UsersPage() {
   const { data: session, status } = useSession();
-  const [users, setUsers] = useState<GetUser[]>([
-    {
-      id: 1,
-      name: "Jhon Doe",
-      email: "john.doe@example.com",
-      password: "password123",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
-      role: "admin",
-      createdAt: "2026-01-01",
-      updatedAt: "2026-01-01T00:00:00.000Z",
-    },
-    {
-      id: 2,
-      name: "Jane Doe",
-      email: "jane.doe@example.com",
-      password: "password123",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jane",
-      role: "user",
-      createdAt: "2026-01-02",
-      updatedAt: "2026-01-01T00:00:00.000Z",
-    },
-    {
-      id: 3,
-      name: "Marcos Doe",
-      email: "marcos.doe@example.com",
-      password: "password123",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcos",
-      role: "user",
-      createdAt: "2026-01-03",
-      updatedAt: "2026-01-01T00:00:00.000Z",
-    },
-  ]);
-  const [showDrawer, setShowDrawer] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<StoreUser | null>(null);
+  const userService = useMemo(() => new UserService(), []);
+  const [users, setUsers] = useState<GetUser[]>([]);
+  const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+
+  const [dataUser, setDataUser] = useState<StoreUser>({
+    id: 0,
+    name: "",
+    email: "",
+    password: "",
+    image: "",
+    role: "user",
+    status: true,
+  });
+
+  const getUsers = useCallback(async () => {
+    if (status !== "authenticated" || !session?.user?.token) return;
+    try {
+      setLoading(true);
+      const response = await userService.getUsers(session.user.token);
+      if (response && response.status === 200) {
+        const data = Array.isArray(response.data) ? response.data : [];
+        console.log(data);
+        setUsers(data);
+      }
+    } catch (error) {
+      console.error("Error al obtener las categorías:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [session?.user?.token, status, userService]);
+
+  useEffect(() => {
+    getUsers();
+  }, [getUsers]);
+
+  const openNewUser = () => {
+    setDataUser({
+      id: 0,
+      name: "",
+      email: "",
+      password: "",
+      image: "",
+      role: "user",
+      status: true,
+    });
+    setShow(true);
+  };
+
+  const editUser = (user: GetUser) => {
+    setDataUser({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      password: "",
+      image: user.image,
+      role: user.role,
+      status: user.status,
+    });
+    setShow(true);
+  };
 
   const handleUpdateUser = (userData: StoreUser) => {
     if (userData.id) {
@@ -89,36 +118,11 @@ export default function UsersPage() {
           ...userData as GetUser,
           id: nextId,
           createdAt: new Date().toISOString().split('T')[0],
-          updatedAt: new Date().toISOString(),
         };
         return [newUser, ...prev];
       });
     }
-    setShowDrawer(false);
-  };
-
-  const openNewUser = () => {
-    setSelectedUser({
-      id: 0,
-      name: "",
-      email: "",
-      password: "",
-      image: "",
-      role: "user",
-    });
-    setShowDrawer(true);
-  };
-
-  const editUser = (user: GetUser) => {
-    setSelectedUser({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      password: user.password,
-      image: user.image,
-      role: user.role,
-    });
-    setShowDrawer(true);
+    setShow(false);
   };
 
   if (status === "loading") {
@@ -131,9 +135,6 @@ export default function UsersPage() {
       </div>
     );
   }
-
-  const adminCount = users.filter(u => u.role === 'admin').length;
-  const userCount = users.filter(u => u.role === 'user').length;
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans selection:bg-zinc-200 dark:selection:bg-zinc-800">
@@ -187,8 +188,8 @@ export default function UsersPage() {
                   <input
                     autoFocus
                     type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
                     placeholder="Buscar por nombre o email..."
                     className="w-full h-11 pl-10 pr-4 bg-zinc-100 dark:bg-zinc-900/80 border border-transparent focus:border-zinc-900/10 dark:focus:border-zinc-100/10 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-xs font-bold transition-all outline-none"
                   />
@@ -196,7 +197,7 @@ export default function UsersPage() {
                 <button
                   onClick={() => {
                     setIsSearching(false);
-                    setSearchQuery("");
+                    setSearch("");
                   }}
                   className="px-3 h-11 text-xs font-black text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100 transition-colors"
                 >
@@ -216,43 +217,37 @@ export default function UsersPage() {
           className="grid gap-3"
         >
           <AnimatePresence mode="popLayout">
-            {users
-              .filter(user =>
-                user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                user.email.toLowerCase().includes(searchQuery.toLowerCase())
-              )
-              .map((user) => (
-                <motion.div
-                  key={user.id}
-                  variants={itemVariants}
-                  layout
-                  onClick={() => editUser(user)}
-                  className="group relative bg-white dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 p-2.5 rounded-[20px] transition-all hover:bg-zinc-50 dark:hover:bg-zinc-900 active:scale-[0.99] cursor-pointer hover:shadow"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="relative shrink-0">
-                      <div className="w-11 h-11 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border-[1.5px] border-white dark:border-zinc-800 shadow-sm">
-                        {user.image ? (
-                          <img src={user.image} alt={user.name} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-zinc-400">
-                            <UserIcon className="w-5 h-5" />
-                          </div>
-                        )}
-                      </div>
-                      <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-[1.5px] border-white dark:border-zinc-900 flex items-center justify-center shadow-sm ${user.role === 'admin' ? 'bg-indigo-500' : 'bg-emerald-500'
-                        }`}>
-                        {user.role === 'admin' ? (
-                          <ShieldCheck className="w-2.5 h-2.5 text-white" strokeWidth={3} />
-                        ) : (
-                          <UserIcon className="w-2 h-2 text-white" strokeWidth={3} />
-                        )}
-                      </div>
+            {users.map((user) => (
+              <div
+                key={user.id}
+                onClick={() => editUser(user)}
+                className="group relative bg-white dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 p-2.5 rounded-[20px] transition-all hover:bg-zinc-50 dark:hover:bg-zinc-900 active:scale-[0.99] cursor-pointer hover:shadow"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="relative shrink-0">
+                    <div className="w-11 h-11 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border-[1.5px] border-white dark:border-zinc-800 shadow-sm">
+                      {user.image ? (
+                        <img src={user.image} alt={user.name} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-zinc-400">
+                          <UserIcon className="w-5 h-5" />
+                        </div>
+                      )}
                     </div>
+                    <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-[1.5px] border-white dark:border-zinc-900 flex items-center justify-center shadow-sm ${user.role === 'admin' ? 'bg-indigo-500' : 'bg-emerald-500'
+                      }`}>
+                      {user.role === 'admin' ? (
+                        <ShieldCheck className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                      ) : (
+                        <UserIcon className="w-2 h-2 text-white" strokeWidth={3} />
+                      )}
+                    </div>
+                  </div>
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-col">
-                        <div className="flex items-center justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex flex-col">
                           <div className="flex items-center gap-1.5 min-w-0">
                             <h3 className="text-[14px] font-bold text-zinc-900 dark:text-zinc-50 truncate">
                               {user.name}
@@ -264,18 +259,30 @@ export default function UsersPage() {
                               {user.role}
                             </span>
                           </div>
-                          <MoreVertical className="shrink-0 w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-400 transition-colors" />
+
+                          <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-400 dark:text-zinc-500 mt-0">
+                            <Mail className="w-3 h-3" />
+                            <span className="truncate">{user.email}</span>
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-400 dark:text-zinc-500 mt-0">
-                          <Mail className="w-3 h-3" />
-                          <span className="truncate">{user.email}</span>
+                        <div className="flex items-center gap-2">
+                          <div className="flex flex-col">
+                            <span className={`shrink-0 text-[8px] max-w-[70px] text-center font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md border ${user.status ? 'bg-emerald-50/50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100/50 dark:border-emerald-500/10' : 'bg-red-50/50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-100/50 dark:border-red-500/10'}`}>
+                              {user.status ? 'Activo' : 'Inactivo'}
+                            </span>
+                            <p className="text-[10px] opacity-40 text-zinc-900 dark:text-zinc-50">{user.createdAt}</p>
+                          </div>
+                          <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                            <ChevronRight className="w-4 h-4 text-zinc-400" strokeWidth={2.5} />
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </motion.div>
-              ))}
+                </div>
+              </div>
+            ))}
           </AnimatePresence>
 
           {users.length === 0 && (
@@ -296,12 +303,12 @@ export default function UsersPage() {
         </motion.div>
       </main>
 
-      {showDrawer && selectedUser && (
+      {show && dataUser && (
         <DrawerUser
-          show={showDrawer}
+          show={show}
           onUpdate={handleUpdateUser}
-          data={selectedUser}
-          onClose={() => setShowDrawer(false)}
+          data={dataUser}
+          onClose={() => setShow(false)}
         />
       )}
     </div>

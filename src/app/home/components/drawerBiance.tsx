@@ -31,12 +31,14 @@ interface Props {
   show: boolean;
   type: number;
   onClose: () => void;
+  data: StoreFinance;
 }
 
 export default function DrawerBiance({
   show,
   onClose,
-  type
+  type,
+  data
 }: Props) {
   const { data: session } = useSession();
   const financeService = new FinanceService();
@@ -52,6 +54,7 @@ export default function DrawerBiance({
     paymentMethod: 1,
     category: null,
     date: dayjs(daySelected).toDate(),
+    type,
   });
 
   useEffect(() => {
@@ -75,12 +78,7 @@ export default function DrawerBiance({
     }));
   }, [type]);
 
-  useEffect(() => {
-    setForm((prevState) => ({
-      ...prevState,
-      date: dayjs(daySelected).toDate(),
-    }));
-  }, [daySelected]);
+  useEffect(() => { if (data) { setForm(prev => ({ ...prev, ...data, date: dayjs(daySelected).toDate(), })); } }, [data, daySelected]);
 
   const filterCategory = (data: GetCategory[]) => {
     const category = data.filter((item) => item.type === type);
@@ -99,6 +97,9 @@ export default function DrawerBiance({
 
     try {
       setLoading(true);
+
+      let result: any = {}
+
       let data = {
         ...form,
         amount: form.amount,
@@ -107,22 +108,19 @@ export default function DrawerBiance({
         type: type,
       };
 
-      const result = await financeService.postFinances(
-        data,
-        session?.user?.token
-      );
+      if (data.id) {
+        result = await financeService.updateFinances(data.id, data, session?.user?.token);
+      } else {
+        result = await financeService.postFinances(data, session?.user?.token);
+      }
 
       if (result.status !== 500 && result.status !== 400) {
-        toast.success("Se ha registrado correctamente..");
-        clear();
-        setTimeout(() => {
-          setLoading(false);
-        }, 300);
-      } else {
-        toast.error("Error al registrar..");
+        toast.success(data.id ? "Se ha actualizado correctamente.." : "Se ha registrado correctamente..");
+        setTimeout(() => { setLoading(false); }, 300);
+        if (data.id) { close(); } else { clear(); }
       }
     } catch (error) {
-      toast.error("Error al registrar..");
+      toast.error(data.id ? "Error al actualizar.." : "Error al registrar..");
     }
   };
 
@@ -153,7 +151,8 @@ export default function DrawerBiance({
               (type === 1 ? "text-green-500" : "text-red-500")
             }
           >
-            {type === 1 ? "Nuevo Ingreso" : "Nuevo Gasto"}
+            {data.id ? "Editar " : "Nuevo "}
+            {type === 1 ? "Ingreso" : "Gasto"}
           </DrawerTitle>
           <DrawerDescription>
             Aqui puedes agregar tus finanzas.
@@ -277,7 +276,7 @@ export default function DrawerBiance({
               </div>
             </div>
           </div>
-          {/* <pre>{JSON.stringify(form, null, 2)}</pre> */}
+          {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
