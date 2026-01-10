@@ -1,200 +1,191 @@
 "use client";
 import { useSession } from "next-auth/react";
-// import { CategoryService } from "./services/api";
-import { motion, Variants } from "framer-motion";
-import JIcon from "@/components/me/jicon";
-import { useEffect, useState, useCallback } from "react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart"
-import { TrendingUp } from "lucide-react";
+import { GraphService } from "./services/api";
+import { CategoryService } from "../category/services/api";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { redirect } from "next/navigation";
+import { Loader2, LayoutDashboard, Calendar, Tag, CreditCard, Users as UsersIcon } from "lucide-react";
 
-// import { GetCategory, StoreCategory } from "./interfaces";
-// import DrawerCategory from "./drawerCategory";
+import { SummaryCharts } from "./components/SummaryCharts";
+import { DailyEvolutionCharts } from "./components/DailyEvolutionCharts";
+import { CategoryCharts } from "./components/CategoryCharts";
+import { PaymentMethodCharts } from "./components/PaymentMethodCharts";
+import { UserKPICharts } from "./components/UserKPICharts";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/me/select";
 
-const itemVariants: Variants = {
-  initial: { opacity: 0, y: 50 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.3, ease: "easeInOut" },
-  },
-};
+const tabs = [
+  { id: "summary", label: "Resumen", icon: LayoutDashboard },
+  { id: "daily", label: "Evolución", icon: Calendar },
+  { id: "categories", label: "Categorías", icon: Tag },
+  { id: "payment", label: "Pagos", icon: CreditCard },
+  { id: "users", label: "Usuarios & KPI", icon: UsersIcon },
+];
 
-
-
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-]
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "var(--chart-1)",
-  },
-} satisfies ChartConfig
-
-
-
-export default function Category() {
+export default function GraphicsPage() {
   const { data: session, status } = useSession();
-  // const categoryService = new CategoryService();
-  // const [category, setCategories] = useState<GetCategory[]>([]);
-  const [show, setShow] = useState(false);
-  const [loading, setLoading] = useState(false);
-  // const [dataCategory, setDataCategory] = useState<StoreCategory>({
-  //   name: "",
-  //   typeId: 1,
-  //   status: true,
-  // });
+  const graphService = useMemo(() => new GraphService(), []);
+  const categoryService = useMemo(() => new CategoryService(), []);
 
-  const getCategories = useCallback(async () => {
+  const [activeTab, setActiveTab] = useState("summary");
+  const [loading, setLoading] = useState(true);
+
+  const [data, setData] = useState<any>({});
+
+  const fetchData = useCallback(async () => {
     if (!session?.user?.token) return;
     try {
       setLoading(true);
-      // setCategories([]);
-      // const response = await categoryService.getCategories(session.user.token);
-      // console.log(response);
+      const token = session.user.token;
 
-      // if (response.status === 200) {
-      //   setCategories(response.data);
-      //   setTimeout(() => {
-      //   setLoading(false);
-      // }, 300);
-      // }
+      // Fetch all graph data in parallel
+      const [
+        incomeVsExpense, monthlyBalance, dailyExpenses, dailyIncome,
+        yearly, expensesCat, incomeCat, topCat, distCat, trendCat,
+        expensesPM, incomePM, usagePM, trendPM,
+        userExp, userInc, userBal, ratio, avgExp, growth
+      ] = await Promise.all([
+        graphService.getIncomeVsExpenseByMonth(token),
+        graphService.getMonthlyBalance(token),
+        graphService.getDailyExpenses(token),
+        graphService.getDailyIncome(token),
+        graphService.getYearlyComparison(token),
+        graphService.getExpensesByCategory(token),
+        graphService.getIncomeByCategory(token),
+        graphService.getTopCategoriesByExpense(token),
+        graphService.getExpenseDistributionByCategory(token),
+        graphService.getExpenseTrendByCategory(token),
+        graphService.getExpensesByPaymentMethod(token),
+        graphService.getIncomeByPaymentMethod(token),
+        graphService.getPaymentMethodUsage(token),
+        graphService.getPaymentMethodTrend(token),
+        graphService.getTotalExpenses(token),
+        graphService.getTotalIncome(token),
+        graphService.getUserBalance(token),
+        graphService.getIncomeExpenseRatio(token),
+        graphService.getAverageExpense(token),
+        graphService.getCategoryGrowth(token),
+      ]);
+
+      setData({
+        incomeVsExpense, monthlyBalance, dailyExpenses, dailyIncome,
+        yearly, expensesCat, incomeCat, topCat, distCat, trendCat,
+        expensesPM, incomePM, usagePM, trendPM,
+        userExp, userInc, userBal, ratio, avgExp, growth
+      });
+
     } catch (error) {
-      console.error("Error al obtener las categorías:", error);
+      console.error("Error fetching graphics data:", error);
+    } finally {
+      setLoading(false);
     }
-  }, [session?.user?.token]);
+  }, [session?.user?.token, graphService, categoryService]);
 
   useEffect(() => {
     if (status === "authenticated") {
-      getCategories();
+      fetchData();
     }
-  }, [getCategories, status]);
+  }, [status, fetchData]);
 
-  if (status === "loading") {
+  if (status === "loading" || (loading && status === "authenticated")) {
     return (
-      <div className="loading-page bg-white dark:bg-[#0a0911]">
-        <span className="loader" />
+      <div className="flex h-screen w-full items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-zinc-500" />
+        </div>
       </div>
     );
   }
 
-  if (!session) { return redirect("/login"); }
-
-  const editCategory = (category: any) => {
-    // setDataCategory({
-    //   id: category.id,
-    //   name: category.name,
-    //   typeId: category.type,
-    //   status: category.status,
-    // });
-    setShow(true);
-  };
-
-  const newCategory = () => {
-    // setDataCategory({
-    //   name: "",
-    //   typeId: 1,
-    //   status: true,
-    // });
-    setShow(true);
-  };
+  if (!session) return redirect("/login");
 
   return (
-    <div className="h-screen w-full max-w-xl mx-auto overflow-x-hidden overflow-y-scroll scrollbar dark:scrollbar-dark">
-      <main className="items-center p-2 mt-20">
-        <div className="flex gap-3 justify-around  mb-10 mt-3 select-none">
-          <div className="text-xl font-semibold">Graficos</div>
-          {/* <div
-            className="flex items-center justify-center text-green-500 hover:bg-green-100/50 active:bg-green-100/50
-           hover:dark:bg-green-900/20 active:dark:bg-green-900/20 
-           active:scale-90 duration-200 rounded-xl py-1 px-3 cursor-pointer"
-            onClick={newCategory}
-          >
-            + Nuevo
-          </div> */}
+    <div className="pt-12 bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 pb-20">
+      <header className="bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b dark:border-zinc-800">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-black tracking-tight">Análisis Financiero</h1>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">Visualiza el rendimiento de tus finanzas</p>
+            </div>
+
+            <div className="relative min-w-[200px]">
+              <Select value={activeTab} onValueChange={setActiveTab}>
+                <SelectTrigger className="w-full bg-zinc-100 dark:bg-zinc-800/50 border-none rounded-xl px-4 py-2 text-sm font-bold text-zinc-700 dark:text-zinc-200 focus:ring-2 focus:ring-zinc-500 transition-all">
+                  <SelectValue placeholder="Seleccionar reporte" />
+                </SelectTrigger>
+                <SelectContent className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-zinc-200 dark:border-zinc-800">
+                  {tabs.map((tab) => (
+                    <SelectItem key={tab.id} value={tab.id} className="font-medium cursor-pointer">
+                      <div className="flex items-center gap-2 my-1.5">
+                        <tab.icon size={14} className="text-zinc-500" />
+                        {tab.label}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
+      </header>
 
-        <motion.div
-          variants={itemVariants}
-          initial="initial"
-          animate="animate"
-          className="flex justify-center"
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Area Chart</CardTitle>
-              <CardDescription>
-                Showing total visitors for the last 6 months
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig}>
-                <AreaChart
-                  accessibilityLayer={true}
-                  data={chartData}
-                  margin={{
-                    left: 12,
-                    right: 12,
-                  }}
-                >
-                  <CartesianGrid vertical={false} />
-                  <XAxis
-                    dataKey="month"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    tickFormatter={(value) => value.slice(0, 3)}
-                  />
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent indicator="line" />}
-                  />
-                  <Area
-                    dataKey="desktop"
-                    type="natural"
-                    fill="var(--color-desktop)"
-                    fillOpacity={0.4}
-                    stroke="var(--color-desktop)"
-                  />
-                </AreaChart>
-              </ChartContainer>
-            </CardContent>
-            <CardFooter>
-              <div className="flex w-full items-start gap-2 text-sm">
-                <div className="grid gap-2">
-                  <div className="flex items-center gap-2 leading-none font-medium">
-                    Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-                  </div>
-                  <div className="text-muted-foreground flex items-center gap-2 leading-none">
-                    January - June 2024
-                  </div>
-                </div>
-              </div>
-            </CardFooter>
-          </Card>
-        </motion.div>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:mt-0 overflow-y-auto h-[calc(100dvh-14rem)]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            {activeTab === "summary" && (
+              <SummaryCharts
+                incomeVsExpense={data.incomeVsExpense || []}
+                balance={data.monthlyBalance || []}
+                yearly={data.yearly || []}
+                ratio={data.ratio || []}
+              />
+            )}
+
+            {activeTab === "daily" && (
+              <DailyEvolutionCharts
+                expenses={data.dailyExpenses || []}
+                income={data.dailyIncome || []}
+              />
+            )}
+
+            {activeTab === "categories" && (
+              <CategoryCharts
+                expenses={data.expensesCat || []}
+                income={data.incomeCat || []}
+                topExpenses={data.topCat || []}
+                distribution={data.distCat || []}
+                trend={data.trendCat || []}
+                growth={data.growth || []}
+              />
+            )}
+
+            {activeTab === "payment" && (
+              <PaymentMethodCharts
+                expenses={data.expensesPM || []}
+                income={data.incomePM || []}
+                usage={data.usagePM || []}
+                trend={data.trendPM || []}
+              />
+            )}
+
+            {activeTab === "users" && (
+              <UserKPICharts
+                expenses={data.userExp || []}
+                income={data.userInc || []}
+                balance={data.userBal || []}
+                avgExpense={data.avgExp || []}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
       </main>
-
     </div>
   );
 }
