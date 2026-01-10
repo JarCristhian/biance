@@ -41,6 +41,7 @@ export default function Home() {
   const openNewFinance = (type: number) => {
     setType(type);
     setDataFinance({
+      id: undefined,
       amount: "",
       description: "",
       paymentMethod: 1,

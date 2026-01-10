@@ -143,8 +143,9 @@ export default function DrawerBiance({
 
   return (
     <Drawer open={show} onOpenChange={close}>
-      <DrawerContent>
-        <DrawerHeader>
+      <DrawerContent className="flex flex-col h-[90dvh] max-h-[96dvh]">
+
+        <DrawerHeader className="flex-none">
           <DrawerTitle
             className={
               "font-bold text-2xl " +
@@ -159,7 +160,8 @@ export default function DrawerBiance({
           </DrawerDescription>
         </DrawerHeader>
 
-        <div className="flex-1 overflow-y-auto mx-auto w-full max-w-sm px-8 py-4 pb-0">
+        {/* BODY: Hace scroll si el contenido es largo o si sale el teclado */}
+        <div className="flex-1 overflow-y-auto px-8 py-4 w-full max-w-sm mx-auto">
           <div className="flex flex-col gap-4 items-center justify-center space-x-2">
 
             <div className="flex flex-col space-y-2 w-full">
@@ -216,6 +218,7 @@ export default function DrawerBiance({
             </div>
 
             <div className="w-full">
+              {/* IMPORTANTE: type="tel" suele funcionar mejor para números en móvil que "number" para evitar algunos bugs de scroll */}
               <Input
                 className={`h-11 rounded-xl ${error == "amount" ? 'border border-amber-400' : ''}`}
                 type="number"
@@ -241,7 +244,7 @@ export default function DrawerBiance({
               />
             </div>
 
-            <div className="flex justify-center items-center w-full px-4 mt-2">
+            <div className="flex justify-center items-center w-full px-4 mt-2 mb-6">
               <Calendar
                 className="w-full"
                 mode="single"
@@ -255,8 +258,8 @@ export default function DrawerBiance({
           </div>
         </div>
 
-        <DrawerFooter className="px-6">
-          <hr className="mb-2" />
+        <DrawerFooter className="px-6 flex-none pb-6 bg-white dark:bg-black z-10">
+          <hr className="mb-2 mx-10" />
 
           <div className="mx-auto w-full max-w-xs">
             <div className="flex items-center gap-3">
@@ -276,7 +279,6 @@ export default function DrawerBiance({
               </div>
             </div>
           </div>
-          {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
