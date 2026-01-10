@@ -6,7 +6,11 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      spacing: {
+        safe: "env(safe-area-inset-bottom)",
+      },
+    },
   },
   plugins: [],
 };

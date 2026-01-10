@@ -143,14 +143,19 @@ export default function DrawerBiance({
 
   return (
     <Drawer open={show} onOpenChange={close}>
-      <DrawerContent className="flex flex-col h-[90dvh] max-h-[96dvh]">
-
-        <DrawerHeader className="flex-none">
+      <DrawerContent
+        className="
+      h-[100dvh]
+      max-h-[100dvh]
+      flex
+      flex-col
+    "
+      >
+        {/* ===== HEADER ===== */}
+        <DrawerHeader className="shrink-0">
           <DrawerTitle
-            className={
-              "font-bold text-2xl " +
-              (type === 1 ? "text-green-500" : "text-red-500")
-            }
+            className={`font-bold text-2xl ${type === 1 ? "text-green-500" : "text-red-500"
+              }`}
           >
             {data.id ? "Editar " : "Nuevo "}
             {type === 1 ? "Ingreso" : "Gasto"}
@@ -160,45 +165,48 @@ export default function DrawerBiance({
           </DrawerDescription>
         </DrawerHeader>
 
-        {/* BODY: Hace scroll si el contenido es largo o si sale el teclado */}
-        <div className="flex-1 overflow-y-auto px-8 py-4 w-full max-w-sm mx-auto">
-          <div className="flex flex-col gap-4 items-center justify-center space-x-2">
+        {/* ===== BODY (SCROLL) ===== */}
+        <div className="flex-1 overflow-y-auto overscroll-contain">
+          <div className="mx-auto w-full max-w-sm px-8 py-4 pb-28">
+            <div className="flex flex-col gap-4">
 
-            <div className="flex flex-col space-y-2 w-full">
+              {/* CATEGORIA */}
               <Select
-                defaultValue={form.category?.toString()}
                 value={form.category?.toString()}
                 onValueChange={(e) => {
-                  setForm({ ...form, category: parseInt(e) }), setError("");
+                  setForm({ ...form, category: parseInt(e) });
+                  setError("");
                 }}
               >
-                <SelectTrigger className={`h-11 rounded-xl ${error == "category" ? 'border border-amber-400' : ''}`}>
+                <SelectTrigger
+                  className={`h-11 rounded-xl ${error === "category" ? "border border-amber-400" : ""
+                    }`}
+                >
                   <div className="flex items-center gap-2">
-                    <JIcon name="stack" width='w-4' />
+                    <JIcon name="stack" width="w-4" />
                     <SelectValue placeholder="Seleccione" />
                   </div>
+                  <SelectContent>
+                    <SelectGroup>
+                      {category.map((item) => (
+                        <SelectItem key={item.id} value={item.id.toString()}>
+                          {item.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {category.map((item, index) => (
-                      <SelectItem key={item.id} value={item.id.toString()}>
-                        {item.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
               </Select>
-            </div>
 
-            <div className="w-full">
+              {/* METODO DE PAGO */}
               <Select
                 value={form.paymentMethod?.toString()}
                 onValueChange={(e) => {
-                  setForm({ ...form, paymentMethod: parseInt(e) }),
-                    setError("");
+                  setForm({ ...form, paymentMethod: parseInt(e) });
+                  setError("");
                 }}
               >
-                <SelectTrigger className={`h-11 rounded-xl `}>
+                <SelectTrigger className="h-11 rounded-xl">
                   <div className="flex items-center gap-2">
                     <JIcon name="paymentMethod" width="w-4" />
                     <SelectValue placeholder="Seleccione" />
@@ -206,81 +214,116 @@ export default function DrawerBiance({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem key={1} value={(1).toString()}>
-                      Efectivo
-                    </SelectItem>
-                    <SelectItem key={2} value={(2).toString()}>
-                      Transferencia
-                    </SelectItem>
+                    <SelectItem value="1">Efectivo</SelectItem>
+                    <SelectItem value="2">Transferencia</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
-            </div>
 
-            <div className="w-full">
-              {/* IMPORTANTE: type="tel" suele funcionar mejor para números en móvil que "number" para evitar algunos bugs de scroll */}
+              {/* MONTO */}
               <Input
-                className={`h-11 rounded-xl ${error == "amount" ? 'border border-amber-400' : ''}`}
                 type="number"
+                className={`h-11 rounded-xl ${error === "amount" ? "border border-amber-400" : ""
+                  }`}
                 value={form.amount}
-                onChange={(e) => {
-                  setForm({ ...form, amount: e.target.value }), setError("");
-                }}
-                autoComplete="off"
                 placeholder="$ 0.00"
-              />
-            </div>
-
-            <div className="w-full">
-              <Input
-                className={`h-11 rounded-xl ${error == "description" ? 'border border-amber-400' : ''}`}
-                value={form.description}
-                onChange={(e) => {
-                  setForm({ ...form, description: e.target.value }),
-                    setError("");
-                }}
                 autoComplete="off"
-                placeholder="Descripción..."
-              />
-            </div>
-
-            <div className="flex justify-center items-center w-full px-4 mt-2 mb-6">
-              <Calendar
-                className="w-full"
-                mode="single"
-                selected={new Date(form.date)}
-                captionLayout="dropdown"
-                onSelect={(date) => {
-                  setForm({ ...form, date: date as Date });
+                onFocus={(e) =>
+                  e.currentTarget.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  })
+                }
+                onChange={(e) => {
+                  setForm({ ...form, amount: e.target.value });
+                  setError("");
                 }}
               />
+
+              {/* DESCRIPCIÓN */}
+              <Input
+                className={`h-11 rounded-xl ${error === "description" ? "border border-amber-400" : ""
+                  }`}
+                value={form.description}
+                placeholder="Descripción..."
+                autoComplete="off"
+                onFocus={(e) =>
+                  e.currentTarget.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  })
+                }
+                onChange={(e) => {
+                  setForm({ ...form, description: e.target.value });
+                  setError("");
+                }}
+              />
+
+              {/* CALENDARIO */}
+              <div className="w-full mt-2">
+                <Calendar
+                  className="w-full"
+                  mode="single"
+                  selected={new Date(form.date)}
+                  captionLayout="dropdown"
+                  onSelect={(date) =>
+                    setForm({ ...form, date: date as Date })
+                  }
+                />
+              </div>
+
             </div>
           </div>
         </div>
 
-        <DrawerFooter className="px-6 flex-none pb-6 bg-white dark:bg-black z-10">
-          <hr className="mb-2 mx-10" />
-
+        {/* ===== FOOTER FIJO ===== */}
+        <DrawerFooter
+          className="
+        sticky
+        bottom-0
+        shrink-0
+        bg-background
+        border-t
+        px-6
+        pb-safe
+      "
+        >
           <div className="mx-auto w-full max-w-xs">
-            <div className="flex items-center gap-3">
-              <div
+            <div className="flex gap-3">
+              <button
                 onClick={close}
-                className="flex items-center gap-1 justify-center text-zinc-800 hover:bg-zinc-100/50 active:bg-zinc-100/50 dark:text-white hover:dark:bg-zinc-800/70 active:dark:bg-zinc-900/20 active:scale-90 cursor-pointer duration-200 rounded-xl py-2 px-6"
+                className="
+              px-6 py-2
+              rounded-xl
+              text-zinc-800 dark:text-white
+              hover:bg-zinc-100/50 dark:hover:bg-zinc-800/70
+              active:scale-90
+              duration-200
+            "
               >
                 Cancelar
-              </div>
+              </button>
 
-              <div
+              <button
                 onClick={saveFinance}
-                className="flex-1 items-center justify-center text-center content-center text-lg h-12 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-bold shadow-lg shadow-zinc-900/10 dark:shadow-none transition-all active:scale-95"
+                className="
+              flex-1 h-12
+              rounded-xl
+              font-bold text-lg
+              bg-zinc-900 dark:bg-zinc-100
+              text-white dark:text-zinc-900
+              active:scale-95
+              shadow
+            "
               >
                 {loading && <Spinner />}
                 Guardar
-              </div>
+              </button>
             </div>
           </div>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
+
   );
 }
