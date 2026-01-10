@@ -5,7 +5,7 @@ import {
   expenseDistributionByCategory, expenseTrendByCategory, expensesByPaymentMethod,
   incomeByPaymentMethod, paymentMethodUsage, paymentMethodTrend, totalExpenses,
   totalIncome, userBalance, incomeExpenseRatio, averageExpense,
-  categoryGrowth
+  categoryGrowth, glowingLineChartData
 } from "../interfaces";
 
 const globalEndpoint = "graph/";
@@ -189,5 +189,14 @@ export class GraphService {
       },
     });
     return result.data as categoryGrowth[];
+  }
+
+  async getGlowingLineChart(token?: string) {
+    const result = await api.get(`${globalEndpoint}glowing-line-chart`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return result.data as glowingLineChartData[];
   }
 }

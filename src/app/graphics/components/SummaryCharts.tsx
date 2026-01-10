@@ -17,25 +17,33 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart"
-import { TrendingUp, TrendingDown, Scale } from "lucide-react"
-import { incomeVsExpenseByMonth, monthlyBalance, yearlyComparison, incomeExpenseRatio } from "../interfaces"
+import { TrendingUp, TrendingDown, Scale, LineChart as LineChartIcon } from "lucide-react"
+import { Line, LineChart } from "recharts";
+import { incomeVsExpenseByMonth, monthlyBalance, yearlyComparison, incomeExpenseRatio, glowingLineChartData } from "../interfaces"
+
+const Badge = ({ children, className }: { children: React.ReactNode, className?: string }) => (
+    <div className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border ${className}`}>
+        {children}
+    </div>
+)
 
 interface SummaryChartsProps {
     incomeVsExpense: incomeVsExpenseByMonth[]
     balance: monthlyBalance[]
     yearly: yearlyComparison[]
     ratio: incomeExpenseRatio[]
+    glowingData: glowingLineChartData[]
 }
 
-export function SummaryCharts({ incomeVsExpense, balance, yearly, ratio }: SummaryChartsProps) {
+export function SummaryCharts({ incomeVsExpense, balance, yearly, ratio, glowingData }: SummaryChartsProps) {
     const incomeVsExpenseConfig = {
         income: {
             label: "Ingresos",
-            color: "#10b981", // Emerald-500 for income
+            color: "#10b981", // Emerald-500
         },
         expense: {
             label: "Gastos",
-            color: "#ef4444", // Rose-500 for expense
+            color: "#f43f5e", // Rose-500
         },
     } satisfies ChartConfig
 
@@ -49,13 +57,94 @@ export function SummaryCharts({ incomeVsExpense, balance, yearly, ratio }: Summa
     const yearlyConfig = {
         balance: {
             label: "Balance Anual",
-            color: "#3f3f46", // Zinc-600
+            color: "#3f3f46",
+        },
+    } satisfies ChartConfig
+
+    const glowingConfig = {
+        income: {
+            label: "Ingresos",
+            color: "#10b981", // Vibrant Emerald
+        },
+        expense: {
+            label: "Gastos",
+            color: "#f43f5e", // Vibrant Rose
         },
     } satisfies ChartConfig
 
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:gap-6">
-            {/* 1. Ingresos vs Gastos por mes */}
+            <Card className="md:col-span-2 overflow-hidden border-none shadow-md bg-white/70 dark:bg-zinc-900/50 backdrop-blur-2xl border border-zinc-200/50 dark:border-zinc-800/50 rounded-3xl">
+                <CardContent>
+                    <div className="mb-6 px-2">
+                        <div className="flex items-center gap-3">
+                            <h2 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Gastos vs Ingresos</h2>
+                            {/* <Badge className="text-emerald-500 bg-emerald-500/10 border-transparent">
+                                <TrendingUp className="h-3.5 w-3.5" />
+                                <span>{incomeVsExpense[0].expense}</span>
+                            </Badge> */}
+                        </div>
+                        <p className="text-zinc-500 dark:text-zinc-400 text-sm">{glowingData[0].month} - {glowingData[glowingData.length - 1].month}</p>
+                    </div>
+
+                    <ChartContainer config={glowingConfig} className="h-[200px] w-full">
+                        <LineChart
+                            accessibilityLayer
+                            data={glowingData}
+                            margin={{
+                                left: 12,
+                                right: 12,
+                            }}
+                        >
+                            <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-zinc-200 dark:stroke-zinc-800" opacity={0.5} />
+                            <XAxis
+                                dataKey="month"
+                                tickLine={false}
+                                axisLine={false}
+                                tickMargin={8}
+                                tick={{ fill: 'currentColor', fontSize: 12 }}
+                                className="text-zinc-500 dark:text-zinc-400"
+                                tickFormatter={(value) => value.slice(0, 3)}
+                            />
+                            <ChartTooltip
+                                cursor={false}
+                                content={<ChartTooltipContent hideLabel />}
+                            />
+                            <Line
+                                dataKey="income"
+                                type="bump"
+                                stroke="#10b981"
+                                dot={false}
+                                strokeWidth={2}
+                                filter="url(#rainbow-line-glow)"
+                                animationDuration={2000}
+                            />
+                            <Line
+                                dataKey="expense"
+                                type="bump"
+                                stroke="#f43f5e"
+                                dot={false}
+                                strokeWidth={2}
+                                filter="url(#rainbow-line-glow)"
+                                animationDuration={2000}
+                            />
+                            <defs>
+                                <filter
+                                    id="rainbow-line-glow"
+                                    x="-20%"
+                                    y="-20%"
+                                    width="140%"
+                                    height="140%"
+                                >
+                                    <feGaussianBlur stdDeviation="10" result="blur" />
+                                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                </filter>
+                            </defs>
+                        </LineChart>
+                    </ChartContainer>
+                </CardContent>
+            </Card>
+
             <Card className="overflow-hidden border-none shadow-md bg-white/70 dark:bg-zinc-900/50 backdrop-blur-2xl border border-zinc-200/50 dark:border-zinc-800/50">
                 <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
@@ -120,7 +209,6 @@ export function SummaryCharts({ incomeVsExpense, balance, yearly, ratio }: Summa
                 </CardContent>
             </Card>
 
-            {/* 2. Balance mensual */}
             <Card className="overflow-hidden border-none shadow-md bg-white/70 dark:bg-zinc-900/50 backdrop-blur-2xl border border-zinc-200/50 dark:border-zinc-800/50">
                 <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">

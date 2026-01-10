@@ -1,11 +1,10 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { GraphService } from "./services/api";
-import { CategoryService } from "../category/services/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { redirect } from "next/navigation";
-import { Loader2, LayoutDashboard, Calendar, Tag, CreditCard, Users as UsersIcon } from "lucide-react";
+import { LayoutDashboard, Calendar, Tag, CreditCard, Users as UsersIcon } from "lucide-react";
 
 import { SummaryCharts } from "./components/SummaryCharts";
 import { DailyEvolutionCharts } from "./components/DailyEvolutionCharts";
@@ -25,7 +24,6 @@ const tabs = [
 export default function GraphicsPage() {
   const { data: session, status } = useSession();
   const graphService = useMemo(() => new GraphService(), []);
-  const categoryService = useMemo(() => new CategoryService(), []);
 
   const [activeTab, setActiveTab] = useState("summary");
   const [loading, setLoading] = useState(true);
@@ -38,12 +36,11 @@ export default function GraphicsPage() {
       setLoading(true);
       const token = session.user.token;
 
-      // Fetch all graph data in parallel
       const [
         incomeVsExpense, monthlyBalance, dailyExpenses, dailyIncome,
         yearly, expensesCat, incomeCat, topCat, distCat, trendCat,
         expensesPM, incomePM, usagePM, trendPM,
-        userExp, userInc, userBal, ratio, avgExp, growth
+        userExp, userInc, userBal, ratio, avgExp, growth, glowingData
       ] = await Promise.all([
         graphService.getIncomeVsExpenseByMonth(token),
         graphService.getMonthlyBalance(token),
@@ -65,13 +62,14 @@ export default function GraphicsPage() {
         graphService.getIncomeExpenseRatio(token),
         graphService.getAverageExpense(token),
         graphService.getCategoryGrowth(token),
+        graphService.getGlowingLineChart(token),
       ]);
 
       setData({
         incomeVsExpense, monthlyBalance, dailyExpenses, dailyIncome,
         yearly, expensesCat, incomeCat, topCat, distCat, trendCat,
         expensesPM, incomePM, usagePM, trendPM,
-        userExp, userInc, userBal, ratio, avgExp, growth
+        userExp, userInc, userBal, ratio, avgExp, growth, glowingData
       });
 
     } catch (error) {
@@ -79,7 +77,7 @@ export default function GraphicsPage() {
     } finally {
       setLoading(false);
     }
-  }, [session?.user?.token, graphService, categoryService]);
+  }, [session?.user?.token, graphService]);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -89,9 +87,10 @@ export default function GraphicsPage() {
 
   if (status === "loading" || (loading && status === "authenticated")) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-zinc-50 dark:bg-zinc-950">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-12 w-12 animate-spin text-zinc-500" />
+      <div className="flex items-center justify-center h-screen bg-white dark:bg-zinc-950">
+        <div className="relative">
+          <div className="w-12 h-12 rounded-full border-2 border-zinc-100 dark:border-zinc-800" />
+          <div className="absolute inset-0 w-12 h-12 rounded-full border-t-2 border-zinc-900 dark:border-zinc-100 animate-spin" />
         </div>
       </div>
     );
@@ -100,9 +99,9 @@ export default function GraphicsPage() {
   if (!session) return redirect("/login");
 
   return (
-    <div className="pt-12 bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 pb-20">
-      <header className="bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b dark:border-zinc-800">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans selection:bg-zinc-200 dark:selection:bg-zinc-800">
+      <div className="bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-200/50 dark:border-zinc-800/50 pt-16 pb-4">
+        <div className="max-w-lg mx-auto px-4">
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-black tracking-tight">Gráficos</h1>
@@ -128,7 +127,7 @@ export default function GraphicsPage() {
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:mt-0 overflow-y-auto h-[calc(100dvh-10rem)]">
         <AnimatePresence mode="wait">
@@ -145,6 +144,7 @@ export default function GraphicsPage() {
                 balance={data.monthlyBalance || []}
                 yearly={data.yearly || []}
                 ratio={data.ratio || []}
+                glowingData={data.glowingData || []}
               />
             )}
 

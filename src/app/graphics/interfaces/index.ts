@@ -105,3 +105,9 @@ export interface categoryGrowth {
   categoryName?: string;
   growth: number;
 }
+
+export interface glowingLineChartData {
+  month: string;
+  income: number;
+  expense: number;
+}
