@@ -143,9 +143,7 @@ export default function DrawerBiance({
 
   return (
     <Drawer open={show} onOpenChange={close}>
-      <DrawerContent
-        className="fixed inset-0 h-[100dvh] flex flex-col bg-white dark:bg-zinc-900"
-      >
+      <DrawerContent>
         <DrawerHeader>
           <DrawerTitle
             className={
@@ -161,7 +159,6 @@ export default function DrawerBiance({
           </DrawerDescription>
         </DrawerHeader>
 
-        {/* Contenido con scroll interno */}
         <div className="flex-1 overflow-y-auto mx-auto w-full max-w-sm px-8 py-4 pb-0">
           <div className="flex flex-col gap-4 items-center justify-center space-x-2">
 
@@ -181,7 +178,7 @@ export default function DrawerBiance({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {category.map((item) => (
+                    {category.map((item, index) => (
                       <SelectItem key={item.id} value={item.id.toString()}>
                         {item.name}
                       </SelectItem>
@@ -199,7 +196,7 @@ export default function DrawerBiance({
                     setError("");
                 }}
               >
-                <SelectTrigger className="h-11 rounded-xl">
+                <SelectTrigger className={`h-11 rounded-xl `}>
                   <div className="flex items-center gap-2">
                     <JIcon name="paymentMethod" width="w-4" />
                     <SelectValue placeholder="Seleccione" />
@@ -207,8 +204,12 @@ export default function DrawerBiance({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem key={1} value="1">Efectivo</SelectItem>
-                    <SelectItem key={2} value="2">Transferencia</SelectItem>
+                    <SelectItem key={1} value={(1).toString()}>
+                      Efectivo
+                    </SelectItem>
+                    <SelectItem key={2} value={(2).toString()}>
+                      Transferencia
+                    </SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -255,7 +256,7 @@ export default function DrawerBiance({
         </div>
 
         <DrawerFooter className="px-6">
-          <hr className="mb-2 mx-10" />
+          <hr className="mb-2" />
 
           <div className="mx-auto w-full max-w-xs">
             <div className="flex items-center gap-3">
@@ -275,6 +276,7 @@ export default function DrawerBiance({
               </div>
             </div>
           </div>
+          {/* <pre>{JSON.stringify(form, null, 2)}</pre> */}
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
