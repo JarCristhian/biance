@@ -103,21 +103,21 @@ export default function GraphicsPage() {
     <div className="pt-12 bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 pb-20">
       <header className="bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b dark:border-zinc-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-black tracking-tight">Análisis Financiero</h1>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">Visualiza el rendimiento de tus finanzas</p>
+              <h1 className="text-2xl font-black tracking-tight">Gráficos</h1>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">Visualiza tus finanzas</p>
             </div>
 
-            <div className="relative min-w-[200px]">
+            <div className="relative">
               <Select value={activeTab} onValueChange={setActiveTab}>
-                <SelectTrigger className="w-full bg-zinc-100 dark:bg-zinc-800/50 border-none rounded-xl px-4 py-2 text-sm font-bold text-zinc-700 dark:text-zinc-200 focus:ring-2 focus:ring-zinc-500 transition-all">
-                  <SelectValue placeholder="Seleccionar reporte" />
+                <SelectTrigger className="w-full bg-zinc-100 dark:bg-zinc-800/50 border-none rounded-xl px-4 py-1 text-sm font-bold text-zinc-700 dark:text-zinc-200 focus:ring-2 focus:ring-zinc-500 transition-all">
+                  <SelectValue placeholder="Seleccionar gráfico" />
                 </SelectTrigger>
                 <SelectContent className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-zinc-200 dark:border-zinc-800">
                   {tabs.map((tab) => (
                     <SelectItem key={tab.id} value={tab.id} className="font-medium cursor-pointer">
-                      <div className="flex items-center gap-2 my-1.5">
+                      <div className="flex items-center gap-2 my-1.5 mx-1">
                         <tab.icon size={14} className="text-zinc-500" />
                         {tab.label}
                       </div>
@@ -130,7 +130,7 @@ export default function GraphicsPage() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:mt-0 overflow-y-auto h-[calc(100dvh-14rem)]">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:mt-0 overflow-y-auto h-[calc(100dvh-12rem)]">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
