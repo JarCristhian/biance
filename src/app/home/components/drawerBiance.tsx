@@ -25,7 +25,8 @@ import { Calendar } from "@/components/ui/calendar";
 import dayjs from "dayjs";
 import JIcon from "@/components/me/jicon";
 import { toast } from "sonner";
-import { useGlobalStore } from "@/store/globalState";
+import { useGlobalStore } from "@/hooks/useGlobalStore";
+import { Button } from "@/components/me/button";
 
 interface Props {
   show: boolean;
@@ -267,13 +268,13 @@ export default function DrawerBiance({
                 Cancelar
               </div>
 
-              <div
+              <Button
                 onClick={saveFinance}
-                className="flex-1 items-center justify-center text-center content-center text-lg h-12 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-bold shadow-lg shadow-zinc-900/10 dark:shadow-none transition-all active:scale-95"
+                className="flex flex-1 items-center justify-center text-center content-center text-lg h-12 transition-all active:scale-95"
               >
                 {loading && <Spinner />}
                 Guardar
-              </div>
+              </Button>
             </div>
           </div>
           {/* <pre>{JSON.stringify(form, null, 2)}</pre> */}

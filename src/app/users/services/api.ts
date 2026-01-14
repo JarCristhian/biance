@@ -1,4 +1,4 @@
-import api from "@/app/api/apiClient";
+import api from "@/lib/api";
 import { StoreUser } from "../interfaces";
 
 export interface Params {

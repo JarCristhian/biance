@@ -22,6 +22,7 @@ import {
 } from "@/components/me/select";
 import { toast } from "sonner";
 import { Calendar, Clock, DollarSign, Tag, CheckCircle2, CalendarPlus, CalendarSync } from "lucide-react";
+import { Button } from "@/components/me/button";
 
 interface Props {
   show: boolean;
@@ -227,12 +228,12 @@ export default function DrawerTask({
               </button>
 
               {!isReadOnly && (
-                <button
+                <Button
                   onClick={saveTask}
-                  className="flex-2 h-12 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-bold shadow-lg shadow-zinc-900/10 dark:shadow-none transition-all active:scale-95"
+                  className="flex-2 h-12 font-bold"
                 >
                   Guardar
-                </button>
+                </Button>
               )}
             </div>
           </DrawerFooter>

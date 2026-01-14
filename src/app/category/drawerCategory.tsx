@@ -22,6 +22,7 @@ import {
 } from "@/components/me/select";
 import { toast } from "sonner";
 import { Tag, ArrowUpCircle, ArrowDownCircle, PackagePlus, RefreshCcw } from "lucide-react";
+import { Button } from "@/components/me/button";
 
 interface Props {
   show: boolean;
@@ -183,12 +184,12 @@ export default function DrawerCategory({
                 Cancelar
               </button>
 
-              <button
+              <Button
                 onClick={saveCategory}
-                className="flex-2 h-12 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-bold shadow-lg shadow-zinc-900/10 dark:shadow-none transition-all active:scale-[0.98] hover:opacity-90"
+                className="flex-2 h-12"
               >
                 {data.id ? "Actualizar" : "Crear Categoría"}
-              </button>
+              </Button>
             </div>
           </DrawerFooter>
         </div>

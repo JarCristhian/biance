@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import isoWeek from "dayjs/plugin/isoWeek";
-import { useGlobalStore } from "@/store/globalState";
+import { useGlobalStore } from "@/hooks/useGlobalStore";
 dayjs.locale("es");
 dayjs.extend(isoWeek);
 
@@ -106,7 +106,7 @@ export default function Weekdays({ setDString }: Props) {
           <div
             key={day.day}
             className={`flex items-center justify-center h-12 w-12 rounded-2xl cursor-pointer select-none  ${day.active
-              ? "text-zinc-800 dark:text-white bg-zinc-200/70 dark:bg-zinc-800/70"
+              ? "text-primary bg-primary/20 dark:bg-primary/10"
               : "text-zinc-400/80 hover:text-zinc-800  hover:dark:text-white  "
               }`}
             onClick={() => setValue(day.date)}

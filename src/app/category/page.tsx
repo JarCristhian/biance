@@ -14,6 +14,7 @@ import {
   PackagePlus,
 } from "lucide-react";
 import { redirect } from "next/navigation";
+import { Button } from "@/components/me/button";
 
 const containerVariants: Variants = {
   animate: {
@@ -23,21 +24,21 @@ const containerVariants: Variants = {
   }
 };
 
-const itemVariants: Variants = {
-  initial: { opacity: 0, y: 15, filter: "blur(4px)" },
-  animate: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.5, ease: [0.25, 1, 0.5, 1] },
-  },
-  exit: {
-    opacity: 0,
-    scale: 0.95,
-    filter: "blur(8px)",
-    transition: { duration: 0.3 }
-  }
-};
+// const itemVariants: Variants = {
+//   initial: { opacity: 0, y: 15, filter: "blur(4px)" },
+//   animate: {
+//     opacity: 1,
+//     y: 0,
+//     filter: "blur(0px)",
+//     transition: { duration: 0.5, ease: [0.25, 1, 0.5, 1] },
+//   },
+//   exit: {
+//     opacity: 0,
+//     scale: 0.95,
+//     filter: "blur(8px)",
+//     transition: { duration: 0.3 }
+//   }
+// };
 
 export default function Category() {
   const { data: session, status } = useSession();
@@ -145,13 +146,13 @@ export default function Category() {
                     <Search className="w-4.5 h-4.5" strokeWidth={2.5} />
                   </button>
 
-                  <button
+                  <Button
                     onClick={newCategory}
-                    className="group relative flex items-center gap-2 px-3.5 h-9 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl shadow-xl shadow-zinc-900/10 dark:shadow-none active:scale-[0.98] transition-all hover:opacity-90 overflow-hidden"
+                    className="group relative px-3.5"
                   >
                     <Plus className="w-4 h-4" strokeWidth={3} />
                     <span className="text-xs font-bold">Nuevo</span>
-                  </button>
+                  </Button>
                 </div>
               </motion.div>
             ) : (

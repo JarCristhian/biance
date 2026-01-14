@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { motion, type Variants } from "framer-motion";
 import JIcon from "@/components/me/jicon";
 import NumberFlow, { continuous } from '@number-flow/react'
-import { useGlobalStore } from "@/store/globalState";
+import { useGlobalStore } from "@/hooks/useGlobalStore";
 
 const itemVariants: Variants = {
   initial: { opacity: 0, y: 30, skewY: 10 },

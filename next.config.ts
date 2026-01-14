@@ -1,11 +1,14 @@
 import type { NextConfig } from "next";
+import withPWA from "next-pwa";
+
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  turbopack: {},
   async redirects() {
     return [
       {
-        source: "/dashboard",
+        source: "/",
         has: [{ type: "cookie", key: "auth", value: "false" }],
         destination: "/login",
         permanent: false,
@@ -14,4 +17,8 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPWA({
+  dest: "public",
+  register: true,
+  skipWaiting: true,
+})(nextConfig);

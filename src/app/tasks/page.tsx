@@ -1,9 +1,10 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import DrawerTask from "./drawerTask";
 import { GetTask, StoreTask } from "./interfaces";
+import { Button } from "@/components/me/button";
 
 import {
   Plus,
@@ -12,7 +13,6 @@ import {
   DollarSign,
   Search,
   ChevronRight,
-  ArrowUpRight,
   CheckCircle2,
   Circle,
   Ban,
@@ -260,12 +260,12 @@ export default function TasksPage() {
                     <Search className="w-5 h-5" strokeWidth={2.5} />
                   </button>
 
-                  <button
+                  <Button
                     onClick={openNewTask}
-                    className="w-10 h-10 flex items-center justify-center bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl shadow-lg shadow-zinc-900/10 dark:shadow-none active:scale-90 transition-all hover:opacity-90"
+                    className="w-10 h-10 flex items-center justify-center"
                   >
                     <Plus className="w-6 h-6" strokeWidth={3} />
-                  </button>
+                  </Button>
                 </div>
               </motion.div>
             ) : (

@@ -5,7 +5,7 @@ import { GetFinance, StoreFinance } from "../interfaces";
 import { useSession } from "next-auth/react";
 import { motion, type Variants } from "framer-motion";
 import JIcon from "@/components/me/jicon";
-import { useGlobalStore } from "@/store/globalState";
+import { useGlobalStore } from "@/hooks/useGlobalStore";
 
 const itemVariants: Variants = {
   initial: { opacity: 0, y: 50 },

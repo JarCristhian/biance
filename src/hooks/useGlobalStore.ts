@@ -2,7 +2,7 @@ import { create } from "zustand";
 import dayjs from "dayjs";
 import { GetCategory } from "@/app/home/interfaces";
 
-interface GlobalState {
+interface GlobalStore {
     refreshFinance: boolean;
     daySelected: string;
     categories: GetCategory[];
@@ -11,7 +11,7 @@ interface GlobalState {
     setCategories: (state: GetCategory[]) => void;
 }
 
-export const useGlobalStore = create<GlobalState>((set) => ({
+export const useGlobalStore = create<GlobalStore>((set) => ({
     refreshFinance: false,
     daySelected: dayjs().format("YYYY-MM-DD"),
     categories: [],

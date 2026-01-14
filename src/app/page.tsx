@@ -2,14 +2,14 @@
 import { useSession } from "next-auth/react";
 import { Menu } from "../components/me/Menu";
 import { useState } from "react";
-import { NavBar } from "@/components/me/NavBar";
-import TableHome from "./home/components/tableHome";
-import DrawerBiance from "./home/components/drawerBiance";
-import Weekdays from "./home/components/weekdays";
+import { NavBar } from "../components/me/NavBar";
+import TableHome from "../app/home/components/tableHome";
+import DrawerBiance from "../app/home/components/drawerBiance";
+import Weekdays from "../app/home/components/weekdays";
 import dayjs from "dayjs";
-import TotalsHeader from "./home/components/totalsHeader";
-import { redirect, useRouter } from "next/navigation";
-import { StoreFinance } from "./home/interfaces";
+import TotalsHeader from "../app/home/components/totalsHeader";
+import { redirect } from "next/navigation";
+import { StoreFinance } from "../app/home/interfaces";
 
 interface DateI {
   year: number;
@@ -18,7 +18,6 @@ interface DateI {
 }
 
 export default function Home() {
-  const router = useRouter();
   const { data: session, status } = useSession();
   const [show, setShow] = useState(false);
   const [type, setType] = useState(0);
@@ -57,10 +56,6 @@ export default function Home() {
     setDataFinance(finance);
     setShow(true);
   };
-
-  if (status === "unauthenticated") {
-    router.push("/login");
-  }
 
   if (status === "loading") {
     return (

@@ -13,6 +13,8 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useSession, signOut } from "next-auth/react";
+import { ColorPicker } from "@/components/me/colorPicker";
+
 
 export function NavBar() {
   const router = useRouter();
@@ -174,6 +176,8 @@ export function NavBar() {
                 )}
               </div>
             </div>
+
+            <ColorPicker />
           </div>
 
           <div className="flex items-center gap-2">

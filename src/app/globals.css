@@ -3,6 +3,7 @@
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
+
 :root {
   --warning: oklch(0.84 0.16 84);
   --warning-foreground: oklch(0.28 0.07 46);
@@ -12,8 +13,8 @@
   --card-foreground: oklch(0.141 0.005 285.823);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.21 0.006 285.885);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: 240 5.9% 10%;
+  --primary-foreground: 0 0% 98%;
   --secondary: oklch(0.967 0.001 286.375);
   --secondary-foreground: oklch(0.21 0.006 285.885);
   --muted: oklch(0.967 0.001 286.375);
@@ -50,8 +51,8 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.141 0.005 285.823);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.21 0.006 285.885);
+  --primary: 0 0% 98%;
+  --primary-foreground: 240 5.9% 10%;
   --secondary: oklch(0.274 0.006 286.033);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.274 0.006 286.033);
@@ -78,7 +79,57 @@
   --sidebar-ring: oklch(0.442 0.017 285.786);
 }
 
-@theme inline {
+
+/* Color Themes */
+[data-theme-color="default"] {
+  --primary: 240 5% 84%;
+  --primary-foreground: 240 5.9% 10%;
+  --ring: 240 5% 84%;
+}
+
+[data-theme-color="cyan"] {
+  --primary: 182 97% 82%;
+  --primary-foreground: 240 6% 10%;
+  --ring: 182 97% 82%;
+}
+
+[data-theme-color="green"] {
+  --primary: 142 77% 75%;
+  --primary-foreground: 240 6% 10%;
+  --ring: 142 77% 75%;
+}
+
+[data-theme-color="yellow"] {
+  --primary: 45 95% 77%;
+  --primary-foreground: 240 6% 10%;
+  --ring: 45 95% 77%;
+}
+
+[data-theme-color="blue"] {
+  --primary: 217 91% 78%;
+  --primary-foreground: 240 6% 10%;
+  --ring: 217 91% 78%;
+}
+
+[data-theme-color="violet"] {
+  --primary: 255 95% 85%;
+  --primary-foreground: 240 6% 10%;
+  --ring: 255 95% 85%;
+}
+
+[data-theme-color="pink"] {
+  --primary: 325 94% 69%;
+  --primary-foreground: 240 6% 10%;
+  --ring: 325 94% 69%;
+}
+
+[data-theme-color="orange"] {
+  --primary: 0 88% 80%;
+  --primary-foreground: 240 6% 10%;
+  --ring: 0 88% 80%;
+}
+
+@theme {
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -105,8 +156,8 @@
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);

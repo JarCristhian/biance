@@ -1,4 +1,4 @@
-import api from "@/app/api/apiClient";
+import api from "@/lib/api";
 import {
   incomeVsExpenseByMonth, monthlyBalance, dailyExpenses, dailyIncome,
   yearlyComparison, expensesByCategory, incomeByCategory, topCategoriesByExpense,
