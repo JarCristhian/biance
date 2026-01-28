@@ -5,6 +5,7 @@ import { useState } from "react";
 import DrawerTask from "./drawerTask";
 import { GetTask, StoreTask } from "./interfaces";
 import { Button } from "@/components/me/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import {
   Plus,
@@ -195,10 +196,39 @@ export default function TasksPage() {
 
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center h-screen bg-white dark:bg-zinc-950">
-        <div className="relative">
-          <div className="w-12 h-12 rounded-full border-2 border-zinc-100 dark:border-zinc-800" />
-          <div className="absolute inset-0 w-12 h-12 rounded-full border-t-2 border-zinc-900 dark:border-zinc-100 animate-spin" />
+      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+        <div className="bg-white/70 dark:bg-zinc-950/70 backdrop-blur-2xl border-b border-zinc-200/60 dark:border-zinc-800/50 pt-16 pb-4 mt-2">
+          <div className="max-w-lg mx-auto px-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+              <div className="flex gap-2">
+                <Skeleton className="w-10 h-10 rounded-xl" />
+                <Skeleton className="w-10 h-10 rounded-xl" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-xl mx-auto md:px-6 px-4 py-8 space-y-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="flex items-center gap-4 p-3 bg-white dark:bg-zinc-900/30 rounded-[24px] border border-zinc-200/50 dark:border-zinc-800/50">
+              <Skeleton className="w-5 h-5 rounded-full shrink-0" />
+              <div className="flex-1 space-y-3">
+                <div className="flex justify-between">
+                  <Skeleton className="h-5 w-1/2" />
+                  <Skeleton className="h-5 w-16 rounded-lg" />
+                </div>
+                <Skeleton className="h-3 w-3/4" />
+                <div className="flex gap-3">
+                  <Skeleton className="h-4 w-16 rounded-md" />
+                  <Skeleton className="h-4 w-12 rounded-md" />
+                  <Skeleton className="h-4 w-20 rounded-md" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );

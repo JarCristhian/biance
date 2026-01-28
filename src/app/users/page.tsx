@@ -8,6 +8,7 @@ import DrawerUser from "./drawerUser";
 import { GetUser, StoreUser } from "./interfaces";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/me/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import {
   Plus,
@@ -130,10 +131,37 @@ export default function UsersPage() {
 
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center h-screen bg-white dark:bg-zinc-950">
-        <div className="relative">
-          <div className="w-12 h-12 rounded-full border-2 border-zinc-100 dark:border-zinc-800" />
-          <div className="absolute inset-0 w-12 h-12 rounded-full border-t-2 border-zinc-900 dark:border-zinc-100 animate-spin" />
+      <div className="min-h-screen bg-[#fafafa] dark:bg-zinc-950">
+        <div className="bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-200/50 dark:border-zinc-800/50 pt-16 pb-4 mt-2">
+          <div className="max-w-lg mx-auto px-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <Skeleton className="h-8 w-32" />
+                <Skeleton className="h-3 w-56" />
+              </div>
+              <div className="flex gap-2">
+                <Skeleton className="w-9 h-9 rounded-xl" />
+                <Skeleton className="w-24 h-9 rounded-xl" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-xl mx-auto px-6 py-8 space-y-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="flex items-center gap-3 p-2.5 bg-white dark:bg-zinc-900/50 rounded-[20px] border border-zinc-200/50 dark:border-zinc-800/50">
+              <Skeleton className="w-11 h-11 rounded-xl shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-3 w-12 rounded-md" />
+                  </div>
+                  <Skeleton className="h-3 w-20 rounded-md" />
+                </div>
+                <Skeleton className="h-3 w-40" />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -222,7 +250,25 @@ export default function UsersPage() {
           className="grid gap-3"
         >
           <AnimatePresence mode="popLayout">
-            {users.map((user) => (
+            {loading ? (
+              <div className="grid gap-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="flex items-center gap-3 p-2.5 bg-white dark:bg-zinc-900/50 rounded-[20px] border border-zinc-200/50 dark:border-zinc-800/50">
+                    <Skeleton className="w-11 h-11 rounded-xl shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <Skeleton className="h-4 w-24" />
+                          <Skeleton className="h-3 w-12 rounded-md" />
+                        </div>
+                        <Skeleton className="h-3 w-20 rounded-md" />
+                      </div>
+                      <Skeleton className="h-3 w-40" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : users.map((user) => (
               <div
                 key={user.id}
                 onClick={() => editUser(user)}
@@ -290,7 +336,7 @@ export default function UsersPage() {
             ))}
           </AnimatePresence>
 
-          {users.length === 0 && (
+          {!loading && users.length === 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

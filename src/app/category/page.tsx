@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/me/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const containerVariants: Variants = {
   animate: {
@@ -23,22 +24,6 @@ const containerVariants: Variants = {
     }
   }
 };
-
-// const itemVariants: Variants = {
-//   initial: { opacity: 0, y: 15, filter: "blur(4px)" },
-//   animate: {
-//     opacity: 1,
-//     y: 0,
-//     filter: "blur(0px)",
-//     transition: { duration: 0.5, ease: [0.25, 1, 0.5, 1] },
-//   },
-//   exit: {
-//     opacity: 0,
-//     scale: 0.95,
-//     filter: "blur(8px)",
-//     transition: { duration: 0.3 }
-//   }
-// };
 
 export default function Category() {
   const { data: session, status } = useSession();
@@ -105,10 +90,35 @@ export default function Category() {
 
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center h-screen bg-white dark:bg-zinc-950">
-        <div className="relative">
-          <div className="w-12 h-12 rounded-full border-2 border-zinc-100 dark:border-zinc-800" />
-          <div className="absolute inset-0 w-12 h-12 rounded-full border-t-2 border-zinc-900 dark:border-zinc-100 animate-spin" />
+      <div className="min-h-screen bg-[#fafafa] dark:bg-zinc-950">
+        <div className="bg-white dark:bg-zinc-950 border-b border-zinc-200/50 dark:border-zinc-800/50 pt-16 pb-4">
+          <div className="max-w-lg mx-auto px-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <Skeleton className="h-8 w-32" />
+                <Skeleton className="h-3 w-48" />
+              </div>
+              <div className="flex gap-2">
+                <Skeleton className="w-9 h-9 rounded-xl" />
+                <Skeleton className="w-24 h-9 rounded-xl" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-xl mx-auto px-6 py-8 space-y-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="flex items-center gap-4 p-3 bg-white dark:bg-zinc-900/50 rounded-[20px] border border-zinc-200/50 dark:border-zinc-800/50">
+              <Skeleton className="w-11 h-11 rounded-xl shrink-0" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-3 w-1/4" />
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                <Skeleton className="h-4 w-12 rounded-md" />
+                <Skeleton className="h-3 w-16" />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -196,18 +206,24 @@ export default function Category() {
           animate="animate"
           className="grid gap-3"
         >
+
           <AnimatePresence mode="popLayout" initial={false}>
             {loading ? (
-              <motion.div
-                key="loading"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="py-20 flex flex-col items-center justify-center gap-4 opacity-50"
-              >
-                <div className="w-6 h-6 border-2 border-zinc-900 dark:border-zinc-100 border-t-transparent rounded-full animate-spin" />
-                <span className="text-xs font-bold uppercase tracking-widest">Cargando datos</span>
-              </motion.div>
+              <div className="grid gap-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="flex items-center gap-4 p-3 bg-white dark:bg-zinc-900/50 rounded-[20px] border border-zinc-200/50 dark:border-zinc-800/50">
+                    <Skeleton className="w-11 h-11 rounded-xl shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-1/3" />
+                      <Skeleton className="h-3 w-1/4" />
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                      <Skeleton className="h-4 w-12 rounded-md" />
+                      <Skeleton className="h-3 w-16" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) :
               filteredCategories.map((cat) => (
                 <div
