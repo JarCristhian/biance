@@ -27,9 +27,10 @@ const totalChilds: Variants = {
 
 interface Props {
   setDataFinance: (finance: StoreFinance) => void;
+  menu: number;
 }
 
-export default function TableHome({ setDataFinance }: Props) {
+export default function TableHome({ setDataFinance, menu }: Props) {
   const { data: session } = useSession();
   const financeService = new FinanceService();
   const [finance, setFinance] = useState<GetFinance[]>([]);
@@ -54,6 +55,7 @@ export default function TableHome({ setDataFinance }: Props) {
     const response = await financeService.getFinances(
       {
         date: daySelected,
+        type: menu,
       },
       session?.user.token
     );
@@ -66,7 +68,7 @@ export default function TableHome({ setDataFinance }: Props) {
 
   useEffect(() => {
     getFinances();
-  }, [daySelected, refreshFinance]);
+  }, [daySelected, refreshFinance, menu]);
 
   const openEditFinance = (finance: GetFinance) => {
     const dataFinance: StoreFinance = {
@@ -76,7 +78,7 @@ export default function TableHome({ setDataFinance }: Props) {
       category: finance.categoryId,
       paymentMethod: finance.paymentMethodId,
       date: new Date(),
-      type: finance.income > 0 ? 1 : 2,
+      type: menu === 1 ? 3 : finance.income > 0 ? 1 : 2,
     };
 
     setDataFinance(dataFinance);
@@ -89,34 +91,54 @@ export default function TableHome({ setDataFinance }: Props) {
       animate="animate"
       className="flex flex-col items-center w-full mt-10"
     >
-      <div className="flex gap-6 justify-center items-center select-none">
-        <div className="flex flex-col items-center justify-center gap-1 bg-green-100/50 dark:bg-zinc-800/70  rounded-full w-40 h-40 p-4 text-green-500">
-          <motion.div
-            variants={totalChilds}
-            initial="initial"
-            animate="animate"
-            className="flex flex-col items-center justify-center"
-          >
-            <span className="text-2xl font-medium">
-              S/. {header.income.toFixed(2)}
-            </span>
-            <span className="text-lg">Ingresos</span>
-          </motion.div>
+      {menu === 0 ? (
+        <div className="flex gap-6 justify-center items-center select-none">
+          <div className="flex flex-col items-center justify-center gap-1 bg-green-100/50 dark:bg-zinc-800/70  rounded-full w-40 h-40 p-4 text-green-500">
+            <motion.div
+              variants={totalChilds}
+              initial="initial"
+              animate="animate"
+              className="flex flex-col items-center justify-center"
+            >
+              <span className="text-2xl font-medium">
+                S/. {header.income.toFixed(2)}
+              </span>
+              <span className="text-lg">Ingresos</span>
+            </motion.div>
+          </div>
+          <div className="flex flex-col items-center justify-center gap-1 bg-fuchsia-200/40 dark:bg-zinc-800/70 rounded-full w-40 h-40 p-4 text-red-500">
+            <motion.div
+              variants={totalChilds}
+              initial="initial"
+              animate="animate"
+              className="flex flex-col items-center justify-center"
+            >
+              <span className="text-2xl font-medium">
+                S/. {header.expense.toFixed(2)}
+              </span>
+              <span className="text-lg">Gastos</span>
+            </motion.div>
+          </div>
         </div>
-        <div className="flex flex-col items-center justify-center gap-1 bg-fuchsia-200/40 dark:bg-zinc-800/70 rounded-full w-40 h-40 p-4 text-red-500">
-          <motion.div
-            variants={totalChilds}
-            initial="initial"
-            animate="animate"
-            className="flex flex-col items-center justify-center"
-          >
-            <span className="text-2xl font-medium">
-              S/. {header.expense.toFixed(2)}
-            </span>
-            <span className="text-lg">Gastos</span>
-          </motion.div>
-        </div>
-      </div>
+      ) :
+        (
+          <div className="flex gap-6 justify-center items-center select-none">
+            <div className="flex flex-col items-center justify-center gap-1 bg-blue-100/50 dark:bg-zinc-800/70  rounded-full w-40 h-40 p-4 text-blue-500">
+              <motion.div
+                variants={totalChilds}
+                initial="initial"
+                animate="animate"
+                className="flex flex-col items-center justify-center"
+              >
+                <span className="text-2xl font-medium">
+                  S/. {header.expense.toFixed(2)}
+                </span>
+                <span className="text-lg">Ahorros</span>
+              </motion.div>
+            </div>
+          </div>
+        )
+      }
 
       <div className="flex flex-col items-center w-full sm:w-4/5 md:w-5/6 justify-center mt-6">
         <h3 className="text-xl font-semibold mb-2 opacity-85">
@@ -137,7 +159,7 @@ export default function TableHome({ setDataFinance }: Props) {
                     name="arrow"
                     width={
                       "w-5 " +
-                      (invoice.income > 0
+                      (menu === 1 ? "text-blue-500" : invoice.income > 0
                         ? "text-green-500"
                         : "text-red-500 rotate-180")
                     }
@@ -153,10 +175,10 @@ export default function TableHome({ setDataFinance }: Props) {
                 <div
                   className={
                     "flex items-center justify-end gap-1 " +
-                    (invoice.income > 0 ? "text-green-500" : "text-red-500")
+                    (menu === 1 ? "text-blue-500" : invoice.income > 0 ? "text-green-500" : "text-red-500")
                   }
                 >
-                  <strong>{invoice.income > 0 ? "+" : "-"}</strong>
+                  <strong>{menu === 1 ? "" : invoice.income > 0 ? "+" : "-"}</strong>
                   S/.{" "}
                   {invoice.income > 0
                     ? Number(invoice.income).toFixed(2)

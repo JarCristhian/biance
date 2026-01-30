@@ -194,20 +194,6 @@ export function NavBar() {
                 alignOffset={-47}
               >
                 <DropdownMenuGroup className="flex flex-col gap-2 overflow-y-auto h-48">
-                  {/* {10 > 0 ? (
-                    Array.from({ length: 10 }).map((_, index) => (
-                      <DropdownMenuItem key={index}>
-                        <div>
-                          <p>Notification {index}</p>
-                          <p>Notification {index}</p>
-                          <p>Notification {index}</p>
-                          <p>Notification {index}</p>
-                          <p>Notification {index}</p>
-                        </div>
-                      </DropdownMenuItem>
-                    ))
-                  ) : (
-                  )} */}
                   <p className="text-center text-sm opacity-50 mt-20">Sin notificaciones</p>
                 </DropdownMenuGroup>
               </DropdownMenuContent>

@@ -6,6 +6,7 @@ export interface Params {
   perPage?: number;
   search?: string | null;
   date?: string | null;
+  type: number;
 }
 
 export class FinanceService {
@@ -46,8 +47,8 @@ export class FinanceService {
     return result;
   }
 
-  async getTotals(token?: string) {
-    const result = await api.get("finance/totals", {
+  async getTotals(token?: string, type?: number) {
+    const result = await api.get(`finance/totals/${type}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

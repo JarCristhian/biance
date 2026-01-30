@@ -284,10 +284,8 @@ export default function Category() {
               ))}
           </AnimatePresence>
 
-          {filteredCategories.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+          {filteredCategories.length === 0 && !loading && (
+            <div
               className="py-20 text-center"
             >
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-[32px] bg-zinc-100 dark:bg-zinc-900 mb-6">
@@ -297,7 +295,7 @@ export default function Category() {
               <p className="text-zinc-500 dark:text-zinc-500 max-w-[240px] mx-auto text-sm font-medium">
                 Tu lista de categorías está vacía. Empieza por agregar una nueva categoría.
               </p>
-            </motion.div>
+            </div>
           )}
 
         </motion.div>

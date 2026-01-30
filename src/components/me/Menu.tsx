@@ -1,28 +1,41 @@
 import JIcon from "@/components/me/jicon";
 interface Props {
   onOpen: (type: number) => void;
+  menu: number;
 }
-export function Menu({ onOpen }: Props) {
+export function Menu({ onOpen, menu }: Props) {
   return (
     <div className="relative select-none cursor-pointer flex justify-center">
       <div className="flex items-center justify-between fixed z-10 bottom-5 group w-80 h-12 rounded-md py-2 px-4 drop-shadow-md bg-white dark:bg-zinc-900">
         <div className="text-primary text-xl font-semibold">Biance</div>
         <div className="flex gap-1">
-          <div
-            onClick={() => onOpen(1)}
-            className="flex items-center justify-center text-green-500 hover:bg-green-100/50 active:bg-green-100/50 hover:dark:bg-green-900/20 active:dark:bg-green-900/20 active:scale-90 duration-200 rounded-2xl py-1.5 px-4"
-          >
-            <JIcon name="down" width="w-4 h-4 mr-1" />
-            <div>Ingreso</div>
-          </div>
+          {menu === 0 ? (
+            <>
+              <div
+                onClick={() => onOpen(1)}
+                className="flex items-center justify-center text-green-500 hover:bg-green-100/50 active:bg-green-100/50 hover:dark:bg-green-900/20 active:dark:bg-green-900/20 active:scale-90 duration-200 rounded-2xl py-1.5 px-4"
+              >
+                <JIcon name="down" width="w-4 h-4 mr-1" />
+                <div>Ingreso</div>
+              </div>
 
-          <div
-            onClick={() => onOpen(2)}
-            className="flex items-center justify-center text-red-500 hover:bg-red-100/50 active:bg-red-100/50 hover:dark:bg-red-900/20 active:dark:bg-red-900/20 active:scale-90 duration-200 rounded-2xl py-1.5 px-4"
-          >
-            <JIcon name="down" width="w-4 h-4 rotate-180 mr-1" />
-            Gasto
-          </div>
+              <div
+                onClick={() => onOpen(2)}
+                className="flex items-center justify-center text-red-500 hover:bg-red-100/50 active:bg-red-100/50 hover:dark:bg-red-900/20 active:dark:bg-red-900/20 active:scale-90 duration-200 rounded-2xl py-1.5 px-4"
+              >
+                <JIcon name="down" width="w-4 h-4 rotate-180 mr-1" />
+                Gasto
+              </div>
+            </>
+          ) : (
+            <div
+              onClick={() => onOpen(3)}
+              className="flex items-center justify-center text-blue-500 hover:bg-blue-100/50 active:bg-blue-100/50 hover:dark:bg-blue-900/20 active:dark:bg-blue-900/20 active:scale-90 duration-200 rounded-2xl py-1.5 px-6 mr-12"
+            >
+              <JIcon name="down" width="w-4 h-4 mr-1 mt-0.5 rotate-100" />
+              Ahorrar
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -19,8 +19,9 @@ interface DateI {
 
 export default function Home() {
   const { data: session, status } = useSession();
-  const [show, setShow] = useState(false);
-  const [type, setType] = useState(0);
+  const [show, setShow] = useState<boolean>(false);
+  const [type, setType] = useState<number>(0);
+  const [menu, setMenu] = useState<number>(0);
   const [dString, setDString] = useState<DateI>({
     year: dayjs().year(),
     month: dayjs().month().toString(),
@@ -69,15 +70,15 @@ export default function Home() {
 
   return (
     <>
-      <Menu onOpen={openNewFinance} />
+      <Menu onOpen={openNewFinance} menu={menu} />
       <NavBar />
       <div className="h-screen w-full p-4 overflow-x-hidden overflow-y-scroll scrollbar dark:scrollbar-dark text-zinc-600 dark:text-zinc-200">
         <main className="items-center p-2 pt-14 md:px-16 w-full max-w-2xl mx-auto">
 
           <div className="flex justify-between items-center mb-10 mt-3 md:px-20 px-4 select-none">
             <div className="flex gap-3 justify-start sm:justify-center cursor-pointer">
-              <div className="text-xl font-semibold">Efectivo</div>
-              <div className="text-xl font-semibold text-zinc-300 dark:text-zinc-600">
+              <div className={`text-xl font-semibold ${menu === 0 ? "text-zinc-600 dark:text-zinc-200" : "text-zinc-300 dark:text-zinc-600"}`} onClick={() => setMenu(0)}>Efectivo</div>
+              <div className={`text-xl font-semibold ${menu === 1 ? "text-zinc-600 dark:text-zinc-200" : "text-zinc-300 dark:text-zinc-600"}`} onClick={() => setMenu(1)}>
                 Ahorros
               </div>
             </div>
@@ -95,11 +96,11 @@ export default function Home() {
             </div>
           </div>
 
-          <TotalsHeader />
+          <TotalsHeader menu={menu} />
 
           <Weekdays setDString={setDString} />
 
-          <TableHome setDataFinance={openEditFinance} />
+          <TableHome setDataFinance={openEditFinance} menu={menu} />
         </main>
       </div>
       <DrawerBiance

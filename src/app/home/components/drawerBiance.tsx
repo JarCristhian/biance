@@ -43,11 +43,10 @@ export default function DrawerBiance({
 }: Props) {
   const { data: session } = useSession();
   const financeService = new FinanceService();
-  const [instance, setInstance] = useState<GetCategory[]>([]);
-  const [category, setCategories] = useState<GetCategory[]>([]);
+  const [categoryList, setCategoryList] = useState<GetCategory[]>([]);
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const { setRefreshFinance, daySelected } = useGlobalStore();
+  const { setRefreshFinance, daySelected, setCategories, categories } = useGlobalStore();
 
   const [form, setForm] = useState<StoreFinance>({
     amount: "",
@@ -59,20 +58,21 @@ export default function DrawerBiance({
   });
 
   useEffect(() => {
-    const getCategories = async () => {
-      setInstance([]);
-      const response = await financeService.getCategories(session?.user?.token);
-      // console.log(response);
+    if (categories.length === 0) {
+      const getCategories = async () => {
+        const response = await financeService.getCategories(session?.user?.token);
+        console.log(response);
 
-      if (response.data.length !== 0) {
-        setInstance(response.data);
-      }
-    };
-    getCategories();
+        if (response.data.length !== 0) {
+          setCategories(response.data);
+        }
+      };
+      getCategories();
+    }
   }, []);
 
   useEffect(() => {
-    filterCategory(instance);
+    filterCategory(categories);
     setForm((prevState) => ({
       ...prevState,
       date: dayjs(daySelected).toDate(),
@@ -83,7 +83,7 @@ export default function DrawerBiance({
 
   const filterCategory = (data: GetCategory[]) => {
     const category = data.filter((item) => item.type === type);
-    setCategories(category);
+    setCategoryList(category);
     setForm({
       ...form,
       category: category?.length > 0 ? category[0].id : null,
@@ -149,11 +149,11 @@ export default function DrawerBiance({
           <DrawerTitle
             className={
               "font-bold text-2xl " +
-              (type === 1 ? "text-green-500" : "text-red-500")
+              (type === 1 ? "text-green-500" : type === 2 ? "text-red-500" : "text-blue-500")
             }
           >
             {data.id ? "Editar " : "Nuevo "}
-            {type === 1 ? "Ingreso" : "Gasto"}
+            {type === 1 ? "Ingreso" : type === 2 ? "Gasto" : "Ahorro"}
           </DrawerTitle>
           <DrawerDescription>
             Aqui puedes agregar tus finanzas.
@@ -179,7 +179,7 @@ export default function DrawerBiance({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {category.map((item, index) => (
+                    {categoryList.map((item, index) => (
                       <SelectItem key={item.id} value={item.id.toString()}>
                         {item.name}
                       </SelectItem>

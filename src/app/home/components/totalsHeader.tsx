@@ -17,7 +17,7 @@ const itemVariants: Variants = {
   },
 };
 
-export default function TotalsHeader() {
+export default function TotalsHeader({ menu }: { menu: number }) {
   const { data: session } = useSession();
   const financeService = new FinanceService();
   const [header, setHeader] = useState({ income: 0, expense: 0, total: 0 });
@@ -25,21 +25,21 @@ export default function TotalsHeader() {
 
   const getTotals = async () => {
     setHeader({ income: 0, expense: 0, total: 0 });
-    const response = await financeService.getTotals(session?.user.token);
+    const response = await financeService.getTotals(session?.user.token, menu);
     // console.log("totals", response.data);
 
     if (response.data) {
       setHeader({
         income: response.data.income,
         expense: response.data.expense,
-        total: response.data.total,
+        total: menu === 0 ? response.data.total : -response.data.total
       });
     }
   };
-  3
+
   useEffect(() => {
     getTotals();
-  }, [refreshFinance]);
+  }, [refreshFinance, menu]);
 
   return (
     <motion.div variants={itemVariants} initial="initial" animate="animate">
@@ -54,20 +54,22 @@ export default function TotalsHeader() {
               value={header.total}
             />
             <div className="font-semibold text-zinc-400 dark:text-zinc-600">
-              disponible
+              {menu === 0 ? "disponible" : "ahorros"}
             </div>
           </div>
 
-          <div className="opacity-70">
-            <div className="flex items-center text-xs font-bold text-green-500">
-              <JIcon name="down" width="w-3 h-3 mr-1" />
-              {header.income.toFixed(2)}
+          {menu === 0 && (
+            <div className="opacity-70">
+              <div className="flex items-center text-xs font-bold text-green-500">
+                <JIcon name="down" width="w-3 h-3 mr-1" />
+                {header.income.toFixed(2)}
+              </div>
+              <div className="flex items-center text-xs font-bold text-red-500">
+                <JIcon name="down" width="w-3 h-3 rotate-180 mr-1" />{" "}
+                {header.expense.toFixed(2)}
+              </div>
             </div>
-            <div className="flex items-center text-xs font-bold text-red-500">
-              <JIcon name="down" width="w-3 h-3 rotate-180 mr-1" />{" "}
-              {header.expense.toFixed(2)}
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </motion.div>
