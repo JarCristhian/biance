@@ -70,12 +70,9 @@ export default function DrawerCategory({
       if (result.status !== 500 && result.status !== 400) {
         toast.success(data.id ? "Categoría actualizada" : "Categoría creada");
         close();
-      } else {
-        toast.error("Error al registrar..");
       }
-    } catch (error) {
-      toast.error("Error al registrar..");
-      console.error(error);
+    } catch (error: any) {
+      toast.error(error.response.data.message);
     }
   };
 
@@ -150,6 +147,12 @@ export default function DrawerCategory({
                           <span>Gasto</span>
                         </div>
                       </SelectItem>
+                      <SelectItem value="3">
+                        <div className="flex items-center gap-2">
+                          <ArrowDownCircle className="w-4 h-4 text-blue-500" />
+                          <span>Ahorro</span>
+                        </div>
+                      </SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -176,6 +179,8 @@ export default function DrawerCategory({
           </div>
 
           <DrawerFooter className="px-6 pb-8 mt-2">
+            {/* <pre>{JSON.stringify(form, null, 2)}</pre> */}
+
             <div className="flex items-center gap-3">
               <button
                 onClick={onClose}

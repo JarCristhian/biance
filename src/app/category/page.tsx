@@ -12,6 +12,7 @@ import {
   ArrowUpCircle,
   ArrowDownCircle,
   PackagePlus,
+  ArrowRightCircle,
 } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/me/button";
@@ -235,9 +236,9 @@ export default function Category() {
                     <div className="shrink-0">
                       <div className={`w-11 h-11 rounded-xl flex items-center justify-center border shadow-sm ${cat.type === 1
                         ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
-                        : 'bg-rose-50 dark:bg-rose-500/10 border-rose-100 dark:border-rose-500/20 text-rose-600 dark:text-rose-400'
+                        : cat.type === 2 ? 'bg-rose-50 dark:bg-rose-500/10 border-rose-100 dark:border-rose-500/20 text-rose-600 dark:text-rose-400' : 'bg-blue-50 dark:bg-blue-500/10 border-blue-100 dark:border-blue-500/20 text-blue-600 dark:text-blue-400'
                         }`}>
-                        {cat.type === 1 ? <ArrowUpCircle className="w-6 h-6" /> : <ArrowDownCircle className="w-6 h-6" />}
+                        {cat.type === 1 ? <ArrowUpCircle className="w-6 h-6" /> : cat.type === 2 ? <ArrowDownCircle className="w-6 h-6" /> : <ArrowRightCircle className="w-6 h-6" />}
                       </div>
                     </div>
 
@@ -250,9 +251,9 @@ export default function Category() {
                             </h3>
                             <span className={`shrink-0 text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md border ${cat.type === 1
                               ? 'bg-emerald-50/50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100/50 dark:border-emerald-500/10'
-                              : 'bg-rose-50/50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-100/50 dark:border-rose-500/10'
+                              : cat.type === 2 ? 'bg-rose-50/50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-100/50 dark:border-rose-500/10' : 'bg-blue-50/50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-100/50 dark:border-blue-500/10'
                               }`}>
-                              {cat.type === 1 ? 'Ingreso' : 'Gasto'}
+                              {cat.type === 1 ? 'Ingreso' : cat.type === 2 ? 'Gasto' : 'Ahorro'}
                             </span>
                           </div>
                         </div>

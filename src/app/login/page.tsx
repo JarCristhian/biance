@@ -66,10 +66,15 @@ function Login() {
     <>
       <style jsx global>{`
         :root {
-          --cyber-bg: #000000;
-          --cyber-primary: #ffffff;
-          --cyber-secondary: #888888;
-          --cyber-panel: rgba(5, 5, 5, 0.95);
+          --cyber-panel: var(--card);
+          --cyber-border: var(--border);
+          --cyber-input-bg: var(--input);
+          --cyber-input-focus: var(--primary);
+          --cyber-text: var(--foreground);
+          --cyber-text-muted: var(--muted-foreground);
+          --cyber-btn-bg: hsl(var(--primary));
+          --cyber-btn-text: hsl(var(--primary-foreground));
+          --cyber-grid-color: var(--foreground);
         }
 
         body {
@@ -84,11 +89,13 @@ function Login() {
           width: 100vw;
           height: 100vh;
           background-image: 
-            linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            linear-gradient(currentColor 1px, transparent 1px),
+            linear-gradient(90deg, currentColor 1px, transparent 1px);
           background-size: 40px 40px;
           z-index: 0;
+          opacity: 0.03;
           mask-image: radial-gradient(circle at center, black 0%, transparent 90%);
+          color: var(--cyber-grid-color);
         }
 
         .cyber-scanline {
@@ -100,17 +107,19 @@ function Login() {
           background: linear-gradient(
             to bottom,
             transparent,
-            rgba(255, 255, 255, 0.02) 50%,
+            currentColor 50%,
             transparent
           );
           background-size: 100% 2px;
           z-index: 1;
           pointer-events: none;
+          opacity: 0.02;
+          color: var(--cyber-grid-color);
         }
 
         .cyber-panel {
           background: var(--cyber-panel);
-          border: 1px solid rgba(255, 255, 255, 0.15);
+          border: 1px solid var(--cyber-border);
           position: relative;
           width: 100%;
           max-width: 360px; /* Mobile width */
@@ -123,7 +132,7 @@ function Login() {
             calc(100% - 15px) 100%, 
             0 100%
           );
-          box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
 
         .cyber-input-wrap {
@@ -133,20 +142,20 @@ function Login() {
 
         .cyber-input {
           width: 100%;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: var(--cyber-input-bg);
+          border: 1px solid var(--cyber-border);
           padding: 16px 12px 16px 40px;
           font-family: 'JetBrains Mono', monospace;
-          color: #fff;
+          color: var(--cyber-text);
           outline: none;
           transition: all 0.3s;
           clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
         }
 
         .cyber-input:focus {
-          border-color: #fff;
-          background: rgba(255, 255, 255, 0.08);
-          box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+          border-color: var(--cyber-input-focus);
+          background: var(--cyber-input-bg);
+          box-shadow: 0 0 15px hsla(var(--primary), 0.1);
         }
 
         .cyber-label {
@@ -154,7 +163,7 @@ function Login() {
           left: 40px;
           top: 50%;
           transform: translateY(-50%);
-          color: rgba(255, 255, 255, 0.3);
+          color: var(--cyber-text-muted);
           transition: all 0.2s ease;
           pointer-events: none;
           font-size: 12px;
@@ -167,17 +176,17 @@ function Login() {
           top: -10px;
           left: 8px;
           font-size: 9px;
-          color: #fff;
-          background: #000;
+          color: hsl(var(--primary));
+          background: var(--cyber-panel);
           padding: 0 5px;
         }
 
         .cyber-btn {
           width: 100%;
           padding: 16px;
-          background: #fff;
+          background: var(--cyber-btn-bg);
           border: none;
-          color: #000;
+          color: var(--cyber-btn-text);
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 3px;
@@ -187,14 +196,14 @@ function Login() {
         }
 
         .cyber-btn:hover {
-          background: #ccc;
-          box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+          opacity: 0.9;
+          box-shadow: 0 0 15px hsla(var(--primary), 0.3);
         }
 
         .tech-tag {
           font-size: 8px;
-          color: #fff;
-          opacity: 0.3;
+          color: var(--cyber-text);
+          opacity: 0.5;
           letter-spacing: 1.5px;
         }
 
@@ -202,7 +211,7 @@ function Login() {
           position: absolute;
           width: 10px;
           height: 10px;
-          border: 1px solid rgba(255, 255, 255, 0.3);
+          border: 1px solid var(--cyber-border);
         }
       `}</style>
 
@@ -224,7 +233,9 @@ function Login() {
 
               <div className="flex justify-between items-center mb-8">
                 <span className="tech-tag">USER_LOGIN</span>
-                <span className="tech-tag">V4.1_W_O</span>
+                <div className="flex items-center gap-3">
+                  <span className="tech-tag">V4.1_W_O</span>
+                </div>
               </div>
 
               <div className="text-center mb-10">
@@ -232,7 +243,7 @@ function Login() {
                   style={{ clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)' }}>
                   <img src={'/favicon.ico'} alt="favicon" className="w-10 h-10" />
                 </div>
-                <h1 className="text-3xl font-bold text-white tracking-[0.2em] mb-1">BIANCE</h1>
+                <h1 className="text-3xl font-bold text-primary tracking-[0.2em] mb-1">BIANCE</h1>
                 <p className="tech-tag">STARK_INTERFACE</p>
               </div>
 
