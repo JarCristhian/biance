@@ -61,7 +61,7 @@ export default function DrawerBiance({
     if (categories.length === 0) {
       const getCategories = async () => {
         const response = await financeService.getCategories(session?.user?.token);
-        console.log(response);
+        // console.log(response);
 
         if (response.data.length !== 0) {
           setCategories(response.data);

@@ -145,7 +145,7 @@ export default function TableHome({ setDataFinance, menu }: Props) {
           Transacciones  {finance.length ? `(${finance.length})` : ""}
         </h3>
 
-        <div className="flex flex-col items-center w-full overflow-y-scroll scrollbar dark:scrollbar-dark h-[30vh]">
+        <div className="flex flex-col items-center w-full overflow-y-scroll scrollbar dark:scrollbar-dark h-[28vh]">
 
           {finance.map((invoice, index) => (
             <div

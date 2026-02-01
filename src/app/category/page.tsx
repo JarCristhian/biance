@@ -200,7 +200,7 @@ export default function Category() {
         </div>
       </div>
 
-      <main className="max-w-xl mx-auto px-6 py-3 overflow-hidden overflow-y-auto h-[calc(100vh-16rem)]">
+      <main className="max-w-xl mx-auto px-6 py-3 overflow-hidden overflow-y-auto h-[calc(100vh-11rem)]">
         <motion.div
           variants={containerVariants}
           initial="initial"

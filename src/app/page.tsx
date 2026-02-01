@@ -77,8 +77,8 @@ export default function Home() {
 
           <div className="flex justify-between items-center mb-10 mt-3 md:px-20 px-4 select-none">
             <div className="flex gap-3 justify-start sm:justify-center cursor-pointer">
-              <div className={`text-xl font-semibold ${menu === 0 ? "text-zinc-600 dark:text-zinc-200" : "text-zinc-300 dark:text-zinc-600"}`} onClick={() => setMenu(0)}>Efectivo</div>
-              <div className={`text-xl font-semibold ${menu === 1 ? "text-zinc-600 dark:text-zinc-200" : "text-zinc-300 dark:text-zinc-600"}`} onClick={() => setMenu(1)}>
+              <div className={`text-xl font-semibold ${menu === 0 ? "text-zinc-600 dark:text-primary" : "text-primary dark:text-zinc-600"}`} onClick={() => setMenu(0)}>Efectivo</div>
+              <div className={`text-xl font-semibold ${menu === 1 ? "text-zinc-600 dark:text-primary" : "text-primary dark:text-zinc-600"}`} onClick={() => setMenu(1)}>
                 Ahorros
               </div>
             </div>
