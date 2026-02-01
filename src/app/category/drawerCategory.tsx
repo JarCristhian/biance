@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/me/select";
 import { toast } from "sonner";
-import { Tag, ArrowUpCircle, ArrowDownCircle, PackagePlus, RefreshCcw } from "lucide-react";
+import { Tag, ArrowUpCircle, ArrowDownCircle, PackagePlus, RefreshCcw, ArrowRightCircle } from "lucide-react";
 import { Button } from "@/components/me/button";
 
 interface Props {
@@ -149,7 +149,7 @@ export default function DrawerCategory({
                       </SelectItem>
                       <SelectItem value="3">
                         <div className="flex items-center gap-2">
-                          <ArrowDownCircle className="w-4 h-4 text-blue-500" />
+                          <ArrowRightCircle className="w-4 h-4 text-blue-500" />
                           <span>Ahorro</span>
                         </div>
                       </SelectItem>
