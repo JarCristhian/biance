@@ -1,5 +1,4 @@
-"use client";
-// import { TaskService } from "./services/api";
+import { CategoryService } from "./services/api";
 import { useEffect, useState } from "react";
 import { StoreTask } from "./interfaces";
 import { useSession } from "next-auth/react";
@@ -21,8 +20,9 @@ import {
   SelectValue,
 } from "@/components/me/select";
 import { toast } from "sonner";
-import { Calendar, Clock, DollarSign, Tag, CheckCircle2, CalendarPlus, CalendarSync } from "lucide-react";
+import { Calendar, Clock, DollarSign, Tag, CheckCircle2, CalendarPlus, CalendarSync, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/me/button";
+import { useGlobalStore } from "@/hooks/useGlobalStore";
 
 interface Props {
   show: boolean;
@@ -38,7 +38,9 @@ export default function DrawerTask({
   data,
 }: Props) {
   const { data: session } = useSession();
-  // const taskService = new TaskService();
+  const { setRefreshFinance, daySelected, setCategories, categories } = useGlobalStore();
+  const categoryService = new CategoryService();
+
   const [error, setError] = useState<string>("");
   const [form, setForm] = useState<StoreTask>({
     title: "",
@@ -46,15 +48,30 @@ export default function DrawerTask({
     type: "Personal",
     categoryId: 1,
     paymentMethodId: 1,
-    date: new Date().toISOString().split('T')[0],
+    conditionDate: new Date().toISOString().split('T')[0],
     hour: "12:00",
+    frequency: "none",
     amount: 0,
     status: "pending",
   });
 
   useEffect(() => {
+    if (show && categories.length === 0) {
+      const token = (session as any)?.token || (session as any)?.user?.token || (session as any)?.accessToken;
+      if (token) {
+        categoryService.getCategories(token).then((res) => {
+          setCategories(res.data);
+        });
+      }
+    }
+  }, [show, session]);
+
+  useEffect(() => {
     if (data) {
-      setForm(data);
+      setForm({
+        ...data,
+        frequency: data.frequency || "none"
+      });
     }
   }, [data]);
 
@@ -78,8 +95,9 @@ export default function DrawerTask({
       type: "Personal",
       categoryId: 1,
       paymentMethodId: 1,
-      date: new Date().toISOString().split('T')[0],
+      conditionDate: new Date().toISOString().split('T')[0],
       hour: "12:00",
+      frequency: "none",
       amount: 0,
       status: "pending",
     });
@@ -93,10 +111,24 @@ export default function DrawerTask({
 
   const isReadOnly = data?.status === 'completed';
 
+  const [categoryType, setCategoryType] = useState<string>("all");
+
+  const filteredCategories = categories.filter((category: any) => {
+    if (categoryType === "income") return category.type === 1;
+    if (categoryType === "expense") return category.type === 2;
+    return true;
+  });
+
+  const handleTypeChange = (val: string) => {
+    setForm({ ...form, type: val });
+    if (val === "income") setCategoryType("income");
+    if (val === "expense") setCategoryType("expense");
+  };
+
   return (
     <Drawer open={show} onOpenChange={close}>
       <DrawerContent className="bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800">
-        <div className="mx-auto w-full max-w-sm">
+        <div className="mx-auto w-full max-w-sm h-full flex flex-col">
 
           <div className="flex items-center gap-1 mt-2 mx-2">
             {isReadOnly ? (
@@ -123,7 +155,7 @@ export default function DrawerTask({
             </DrawerHeader>
           </div>
 
-          <div className="p-2 pt-2 space-y-4">
+          <div className="p-4 pt-2 space-y-4 overflow-y-auto flex-1 max-h-[75vh]">
             <div className="space-y-4">
               <div className="space-y-1.5 opacity-100 transition-opacity">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Título</label>
@@ -142,26 +174,13 @@ export default function DrawerTask({
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Descripción</label>
-                <div className="relative">
-                  <textarea
-                    disabled={isReadOnly}
-                    value={form.description}
-                    onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    placeholder="Detalles adicionales..."
-                    className={`w-full min-h-[80px] px-4 py-3 text-sm rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border  border-zinc-200 dark:border-zinc-800 focus:ring-1 focus:ring-zinc-900/40 dark:focus:ring-zinc-200 focus:border-zinc-900/10 dark:focus:border-zinc-100/10 outline-none transition-all resize-none text-zinc-800 dark:text-zinc-200 ${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
-                  />
-                </div>
-              </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Categoría</label>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Tipo Tarea</label>
                   <Select
                     disabled={isReadOnly}
                     value={form.type}
-                    onValueChange={(val) => setForm({ ...form, type: val })}
+                    onValueChange={handleTypeChange}
                   >
                     <SelectTrigger className={`${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}>
                       <SelectValue placeholder="Tipo" />
@@ -170,8 +189,51 @@ export default function DrawerTask({
                       <SelectGroup>
                         <SelectItem value="Personal">Personal</SelectItem>
                         <SelectItem value="Trabajo">Trabajo</SelectItem>
-                        <SelectItem value="Compras">Compras</SelectItem>
-                        <SelectItem value="Hogar">Hogar</SelectItem>
+                        <SelectItem value="income">Ingreso (Finanza)</SelectItem>
+                        <SelectItem value="expense">Gasto (Finanza)</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Tipo Categoría</label>
+                  <Select
+                    disabled={isReadOnly}
+                    value={categoryType}
+                    onValueChange={(val) => { setCategoryType(val); setForm({ ...form, categoryId: 1 }); }}
+                  >
+                    <SelectTrigger className={`${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                      <SelectValue placeholder="Filtro" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                      <SelectGroup>
+                        <SelectItem value="all">Todos</SelectItem>
+                        <SelectItem value="income">Ingresos</SelectItem>
+                        <SelectItem value="expense">Gastos</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Categoría</label>
+                  <Select
+                    disabled={isReadOnly}
+                    value={form.categoryId?.toString()}
+                    onValueChange={(val) => setForm({ ...form, categoryId: parseInt(val) })}
+                  >
+                    <SelectTrigger className={`${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                      <SelectValue placeholder="Seleccionar" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                      <SelectGroup>
+                        {filteredCategories.map((category: any) => (
+                          <SelectItem key={category.id} value={category.id.toString()}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -191,34 +253,68 @@ export default function DrawerTask({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Fecha</label>
-                  <Input
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Descripción</label>
+                <div className="relative">
+                  <textarea
                     disabled={isReadOnly}
-                    type="date"
-                    value={form.date}
-                    onChange={(e) => setForm({ ...form, date: e.target.value })}
-                    className={`${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    value={form.description}
+                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    placeholder="Detalles adicionales..."
+                    className={`w-full min-h-[60px] px-4 py-3 text-sm rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border  border-zinc-200 dark:border-zinc-800 focus:ring-1 focus:ring-zinc-900/40 dark:focus:ring-zinc-200 focus:border-zinc-900/10 dark:focus:border-zinc-100/10 outline-none transition-all resize-none text-zinc-800 dark:text-zinc-200 ${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Hora</label>
-                  <Input
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Frecuencia</label>
+                  <Select
                     disabled={isReadOnly}
-                    type="time"
-                    value={form.hour}
-                    onChange={(e) => setForm({ ...form, hour: e.target.value })}
-                    className={`${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
-                  />
+                    value={form.frequency}
+                    onValueChange={(val) => setForm({ ...form, frequency: val })}
+                  >
+                    <SelectTrigger className={`${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                      <SelectValue placeholder="Frecuencia" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                      <SelectGroup>
+                        <SelectItem value="none">Una vez</SelectItem>
+                        <SelectItem value="daily">Diario</SelectItem>
+                        <SelectItem value="monthly">Mensual</SelectItem>
+                        <SelectItem value="yearly">Anual</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Fecha</label>
+                    <Input
+                      disabled={isReadOnly}
+                      type="date"
+                      value={form.conditionDate}
+                      onChange={(e) => setForm({ ...form, conditionDate: e.target.value })}
+                      className={`${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Hora</label>
+                    <Input
+                      disabled={isReadOnly}
+                      type="time"
+                      value={form.hour}
+                      onChange={(e) => setForm({ ...form, hour: e.target.value })}
+                      className={`${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <DrawerFooter className="px-6">
-            <hr className="mt-4 mb-2" />
-
+          <DrawerFooter className="px-6 py-4">
+            <hr className="mb-4" />
             <div className="flex items-center gap-3">
               <button
                 onClick={close}
@@ -230,7 +326,7 @@ export default function DrawerTask({
               {!isReadOnly && (
                 <Button
                   onClick={saveTask}
-                  className="flex-2 h-12 font-bold"
+                  className="flex-2 h-12 font-bold px-8"
                 >
                   Guardar
                 </Button>
@@ -242,3 +338,4 @@ export default function DrawerTask({
     </Drawer>
   );
 }
+

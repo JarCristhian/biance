@@ -26,8 +26,9 @@ export interface GetTask {
   type: string;
   categoryId: number;
   paymentMethodId: number;
-  date: string;
+  conditionDate: string;
   hour: string;
+  frequency: string;
   amount: number;
   status: 'pending' | 'completed' | 'cancelled';
   updatedAt: string;
@@ -41,8 +42,9 @@ export interface StoreTask {
   type: string;
   categoryId: number;
   paymentMethodId: number;
-  date: string;
+  conditionDate: string;
   hour: string;
+  frequency: string;
   amount: number;
   status: 'pending' | 'completed' | 'cancelled';
 }

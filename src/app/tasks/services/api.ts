@@ -1,5 +1,4 @@
 import api from "@/lib/api";
-import { StoreCategory } from "../interfaces";
 
 export interface Params {
   page?: number;
@@ -17,18 +16,30 @@ export class CategoryService {
     });
     return result;
   }
-  async postCategory(data: StoreCategory, token?: string) {
-    const result = await api.post("category", data, {
+}
+
+export class TaskService {
+  async getTasks(params?: Params, token?: string) {
+    const result = await api.get("task", {
+      params,
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(result);
-
     return result;
   }
-  async updateCategory(id: number, data: StoreCategory, token?: string) {
-    const result = await api.patch(`category/${id}`, data, {
+
+  async postTask(data: any, token?: string) {
+    const result = await api.post("task", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return result;
+  }
+
+  async updateTask(id: number, data: any, token?: string) {
+    const result = await api.patch(`task/${id}`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

@@ -1,11 +1,16 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DrawerTask from "./drawerTask";
 import { GetTask, StoreTask } from "./interfaces";
 import { Button } from "@/components/me/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TaskService } from "./services/api";
+import useSocket from "@/hooks/useWebsocket";
+import { toast } from "sonner";
+import dayjs from "dayjs";
+import { useGlobalStore } from "@/hooks/useGlobalStore";
 
 import {
   Plus,
@@ -40,127 +45,62 @@ const containerVariants: Variants = {
 
 export default function TasksPage() {
   const { data: session, status } = useSession();
-  const [tasks, setTasks] = useState<GetTask[]>([
-    {
-      id: 1,
-      title: "Comprar suministros",
-      description: "Ir al supermercado por snacks y bebidas para la oficina",
-      type: "Compras",
-      categoryId: 1,
-      paymentMethodId: 1,
-      date: "2026-01-01",
-      hour: "12:00",
-      amount: 150,
-      status: "pending",
-      updatedAt: "2022-01-01T00:00:00.000Z",
-      authorId: 1
-    },
-    {
-      id: 2,
-      title: "Revisión de Proyecto",
-      description: "Meeting trimestral con el equipo de diseño y producto",
-      type: "Trabajo",
-      categoryId: 2,
-      paymentMethodId: 1,
-      date: "2026-01-02",
-      hour: "09:30",
-      amount: 0,
-      status: "completed",
-      updatedAt: "2022-01-01T00:00:00.000Z",
-      authorId: 1
-    },
-    {
-      id: 3,
-      title: "Entrega de Proyecto",
-      description: "Entrega final del proyecto de diseño web",
-      type: "Trabajo",
-      categoryId: 2,
-      paymentMethodId: 1,
-      date: "2026-01-02",
-      hour: "09:30",
-      amount: 0,
-      status: "completed",
-      updatedAt: "2022-01-01T00:00:00.000Z",
-      authorId: 1
-    },
-    {
-      id: 4,
-      title: "Entrega de Proyecto",
-      description: "Entrega final del proyecto de diseño web",
-      type: "Trabajo",
-      categoryId: 2,
-      paymentMethodId: 1,
-      date: "2026-01-02",
-      hour: "09:30",
-      amount: 0,
-      status: "completed",
-      updatedAt: "2022-01-01T00:00:00.000Z",
-      authorId: 1
-    },
-    {
-      id: 5,
-      title: "Entrega de Proyecto",
-      description: "Entrega final del proyecto de diseño web",
-      type: "Trabajo",
-      categoryId: 2,
-      paymentMethodId: 1,
-      date: "2026-01-02",
-      hour: "09:30",
-      amount: 0,
-      status: "completed",
-      updatedAt: "2022-01-01T00:00:00.000Z",
-      authorId: 1
-    },
-    {
-      id: 6,
-      title: "Entrega de Proyecto",
-      description: "Entrega final del proyecto de diseño web",
-      type: "Trabajo",
-      categoryId: 2,
-      paymentMethodId: 1,
-      date: "2026-01-02",
-      hour: "09:30",
-      amount: 0,
-      status: "cancelled",
-      updatedAt: "2022-01-01T00:00:00.000Z",
-      authorId: 1
-    },
-    {
-      id: 7,
-      title: "Entrega de Proyecto",
-      description: "Entrega final del proyecto de diseño web",
-      type: "Trabajo",
-      categoryId: 2,
-      paymentMethodId: 1,
-      date: "2026-01-02",
-      hour: "09:30",
-      amount: 0,
-      status: "completed",
-      updatedAt: "2022-01-01T00:00:00.000Z",
-      authorId: 1
-    }
-  ]);
+  const [tasks, setTasks] = useState<GetTask[]>([]);
+  const [loadingTasks, setLoadingTasks] = useState(true);
   const [showDrawer, setShowDrawer] = useState(false);
   const [selectedTask, setSelectedTask] = useState<StoreTask | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleUpdateTask = (taskData: StoreTask) => {
-    if (taskData.id) {
-      setTasks(prev => prev.map(t => t.id === taskData.id ? { ...t, ...taskData } as GetTask : t));
-    } else {
-      setTasks(prev => {
-        const nextId = prev.length > 0 ? Math.max(...prev.map(t => t.id)) + 1 : 1;
-        const newTask: GetTask = {
-          ...taskData as GetTask,
-          id: nextId,
-          updatedAt: new Date().toISOString(),
-          authorId: 1,
-        };
-        return [newTask, ...prev];
-      });
+  const taskService = new TaskService();
+  const { executedTask } = useSocket();
+  const { daySelected } = useGlobalStore();
+
+  useEffect(() => {
+    const token = (session as any)?.token || (session as any)?.user?.token || (session as any)?.accessToken;
+    if (token) {
+      fetchTasks(token);
     }
-    setShowDrawer(false);
+  }, [session]);
+
+  useEffect(() => {
+    if (executedTask) {
+      toast.success(executedTask.message, {
+        description: executedTask.title,
+      });
+      const token = (session as any)?.token || (session as any)?.user?.token || (session as any)?.accessToken;
+      fetchTasks(token);
+    }
+  }, [executedTask]);
+
+  const fetchTasks = async (token?: string) => {
+    if (!token) return;
+    try {
+      setLoadingTasks(true);
+      const result = await taskService.getTasks({}, token);
+      console.log("Tasks fetched:", result.data);
+      setTasks(result.data || []);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    } finally {
+      setLoadingTasks(false);
+    }
+  };
+
+  const handleUpdateTask = async (taskData: StoreTask) => {
+    const token = (session as any)?.token || (session as any)?.user?.token || (session as any)?.accessToken;
+    try {
+      if (taskData.id) {
+        await taskService.updateTask(taskData.id, taskData, token);
+      } else {
+        await taskService.postTask(taskData, token);
+      }
+      fetchTasks(token);
+      setShowDrawer(false);
+    } catch (error) {
+      toast.error("Error al guardar la tarea");
+      console.error(error);
+    }
   };
 
   const openNewTask = () => {
@@ -170,8 +110,9 @@ export default function TasksPage() {
       type: "Personal",
       categoryId: 1,
       paymentMethodId: 1,
-      date: new Date().toISOString().split('T')[0],
+      conditionDate: daySelected || new Date().toISOString().split('T')[0],
       hour: "12:00",
+      frequency: "none",
       amount: 0,
       status: "pending",
     });
@@ -186,15 +127,16 @@ export default function TasksPage() {
       type: task.type,
       categoryId: task.categoryId,
       paymentMethodId: task.paymentMethodId,
-      date: task.date,
+      conditionDate: task.conditionDate,
       hour: task.hour,
+      frequency: task.frequency,
       amount: task.amount,
       status: task.status,
     });
     setShowDrawer(true);
   };
 
-  if (status === "loading") {
+  if (loadingTasks) {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
         <div className="bg-white/70 dark:bg-zinc-950/70 backdrop-blur-2xl border-b border-zinc-200/60 dark:border-zinc-800/50 pt-16 pb-4 mt-2">
@@ -392,10 +334,10 @@ export default function TasksPage() {
                                 {task.hour}
                               </span>
                               <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-                              <span className="flex items-center gap-1">
+                              <div className="flex items-center gap-1">
                                 <Calendar className="w-3 h-3" />
-                                {task.date}
-                              </span>
+                                <span>{dayjs(task.conditionDate).format('DD MMM')}</span>
+                              </div>
                             </div>
                           </div>
 
