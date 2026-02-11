@@ -112,7 +112,7 @@ export default function TasksPage() {
       paymentMethodId: 1,
       conditionDate: daySelected || new Date().toISOString().split('T')[0],
       hour: "12:00",
-      frequency: "none",
+      frequency: "daily",
       amount: 0,
       status: "pending",
     });

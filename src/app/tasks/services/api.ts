@@ -46,4 +46,41 @@ export class TaskService {
     });
     return result;
   }
+
+  //notifications
+  async getNotifications(token: string) {
+    const result = await api.get("notifications", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return result;
+  }
+
+  async getUnreadNotifications(token: string) {
+    const result = await api.get("notifications/unread", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return result;
+  }
+
+  async markAsRead(id: number, token: string) {
+    const result = await api.patch(`notifications/${id}/read`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return result;
+  }
+
+  async markAllAsRead(token: string) {
+    const result = await api.patch("notifications/read-all", {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return result;
+  }
 }

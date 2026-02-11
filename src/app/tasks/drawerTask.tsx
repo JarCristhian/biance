@@ -50,7 +50,7 @@ export default function DrawerTask({
     paymentMethodId: 1,
     conditionDate: new Date().toISOString().split('T')[0],
     hour: "12:00",
-    frequency: "none",
+    frequency: "daily",
     amount: 0,
     status: "pending",
   });
@@ -97,7 +97,7 @@ export default function DrawerTask({
       paymentMethodId: 1,
       conditionDate: new Date().toISOString().split('T')[0],
       hour: "12:00",
-      frequency: "none",
+      frequency: "daily",
       amount: 0,
       status: "pending",
     });
@@ -279,8 +279,8 @@ export default function DrawerTask({
                     </SelectTrigger>
                     <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
                       <SelectGroup>
-                        <SelectItem value="none">Una vez</SelectItem>
                         <SelectItem value="daily">Diario</SelectItem>
+                        <SelectItem value="weekly">Semanal</SelectItem>
                         <SelectItem value="monthly">Mensual</SelectItem>
                         <SelectItem value="yearly">Anual</SelectItem>
                       </SelectGroup>

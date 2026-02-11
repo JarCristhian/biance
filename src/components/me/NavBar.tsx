@@ -14,7 +14,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useSession, signOut } from "next-auth/react";
 import { ColorPicker } from "@/components/me/colorPicker";
-
+import { toast } from "sonner";
+import useSocket from "@/hooks/useWebsocket";
+import { useGlobalStore } from "@/hooks/useGlobalStore";
+import { TaskService } from "@/app/tasks/services/api";
 
 export function NavBar() {
   const router = useRouter();
@@ -23,6 +26,12 @@ export function NavBar() {
   const pathname = usePathname();
   const [show, setShow] = useState<boolean>(false);
   const [greeting, setGreeting] = useState<string>("");
+  const { executedTask, newNotification } = useSocket();
+  const { setRefreshFinance } = useGlobalStore();
+
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const notificationService = new TaskService();
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -34,6 +43,59 @@ export function NavBar() {
       setGreeting("Buenas noches");
     }
   }, []);
+
+  useEffect(() => {
+    if (executedTask) {
+      toast.success(executedTask.message, {
+        description: executedTask.title,
+      });
+      setRefreshFinance();
+    }
+  }, [executedTask]);
+
+  useEffect(() => {
+    const token = (session as any)?.token || (session as any)?.user?.token || (session as any)?.accessToken;
+    if (token) {
+      fetchNotifications(token);
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (newNotification) {
+      toast.info(newNotification.title, {
+        description: newNotification.description,
+      });
+      const token = (session as any)?.token || (session as any)?.user?.token || (session as any)?.accessToken;
+      if (token) {
+        fetchNotifications(token);
+      }
+    }
+  }, [newNotification]);
+
+  const fetchNotifications = async (token: string) => {
+    try {
+      const response = await notificationService.getNotifications(token);
+      setNotifications(response.data || []);
+      const unread = response.data?.filter((n: any) => n.status === 'unread').length || 0;
+      setUnreadCount(unread);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    const token = (session as any)?.token || (session as any)?.user?.token || (session as any)?.accessToken;
+    if (!token) return;
+
+    try {
+      await notificationService.markAllAsRead(token);
+      fetchNotifications(token);
+      toast.success("Todas las notificaciones marcadas como leídas");
+    } catch (error) {
+      console.error("Error marking notifications as read:", error);
+    }
+  };
+
 
   if (session) {
     let userT: any;
@@ -183,18 +245,68 @@ export function NavBar() {
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center cursor-pointer p-1 rounded-md hover:bg-gray-100/50 hover:dark:bg-zinc-700/70 active:scale-90 duration-200">
+                <div className="relative flex items-center cursor-pointer p-1 rounded-md hover:bg-gray-100/50 hover:dark:bg-zinc-700/70 active:scale-90 duration-200">
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-zinc-500 dark:text-zinc-400" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeWidth={1.5}><path d="M18.75 9.71v-.705C18.75 5.136 15.726 2 12 2S5.25 5.136 5.25 9.005v.705a4.4 4.4 0 0 1-.692 2.375L3.45 13.81c-1.011 1.575-.239 3.716 1.52 4.214a25.8 25.8 0 0 0 14.06 0c1.759-.498 2.531-2.639 1.52-4.213l-1.108-1.725a4.4 4.4 0 0 1-.693-2.375Z"></path><path strokeLinecap="round" d="M7.5 19c.655 1.748 2.422 3 4.5 3s3.845-1.252 4.5-3"></path></g></svg>
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-4 h-4 text-[9px] font-black bg-red-500 text-white rounded-full">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-44"
+                className="w-80"
                 align="end"
                 sideOffset={14}
                 alignOffset={-47}
               >
-                <DropdownMenuGroup className="flex flex-col gap-2 overflow-y-auto h-48">
-                  <p className="text-center text-sm opacity-50 mt-20">Sin notificaciones</p>
+                <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-200 dark:border-zinc-800">
+                  <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">Notificaciones</h3>
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={handleMarkAllAsRead}
+                      className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      Marcar como leídas
+                    </button>
+                  )}
+                </div>
+                <DropdownMenuGroup className="flex flex-col gap-1 overflow-y-auto max-h-96 p-2">
+                  {notifications.length === 0 ? (
+                    <p className="text-center text-sm opacity-50 py-20">Sin notificaciones</p>
+                  ) : (
+                    notifications.map((notification: any) => (
+                      <div
+                        key={notification.id}
+                        className={`p-3 rounded-lg cursor-pointer transition-colors ${notification.status === 'unread'
+                          ? 'bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900'
+                          : 'bg-zinc-50 dark:bg-zinc-900/50 border border-transparent'
+                          } hover:bg-zinc-100 dark:hover:bg-zinc-800/50`}
+                      >
+                        <div className="flex items-start gap-2">
+                          {notification.status === 'unread' && (
+                            <div className="w-2 h-2 mt-1.5 rounded-full bg-blue-500 shrink-0"></div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 mb-0.5">
+                              {notification.title}
+                            </h4>
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2">
+                              {notification.description}
+                            </p>
+                            <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1">
+                              {new Date(notification.createdAt).toLocaleString('es-ES', {
+                                day: '2-digit',
+                                month: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
