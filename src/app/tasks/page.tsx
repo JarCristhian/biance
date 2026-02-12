@@ -53,7 +53,7 @@ export default function TasksPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const taskService = new TaskService();
-  const { executedTask } = useSocket();
+  const { newNotification } = useSocket();
   const { daySelected } = useGlobalStore();
 
   useEffect(() => {
@@ -64,21 +64,18 @@ export default function TasksPage() {
   }, [session]);
 
   useEffect(() => {
-    if (executedTask) {
-      toast.success(executedTask.message, {
-        description: executedTask.title,
-      });
+    if (newNotification) {
       const token = (session as any)?.token || (session as any)?.user?.token || (session as any)?.accessToken;
       fetchTasks(token);
     }
-  }, [executedTask]);
+  }, [newNotification]);
 
   const fetchTasks = async (token?: string) => {
     if (!token) return;
     try {
       setLoadingTasks(true);
       const result = await taskService.getTasks({}, token);
-      console.log("Tasks fetched:", result.data);
+      // console.log("Tasks fetched:", result.data);
       setTasks(result.data || []);
     } catch (error) {
       console.error("Error fetching tasks:", error);
@@ -287,70 +284,118 @@ export default function TasksPage() {
                 task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 task.description.toLowerCase().includes(searchQuery.toLowerCase())
               )
-              .map((task) => (
-                <motion.div
-                  key={task.id}
-                  variants={itemVariants}
-                  layout
-                  onClick={() => editTask(task)}
-                  className="group relative bg-white dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-zinc-800/50 p-3 rounded-[24px] transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800/30 active:scale-[0.98] cursor-pointer"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`shrink-0 transition-transform group-hover:scale-110 ${task.status === 'completed' ? 'text-emerald-500' : 'text-zinc-300 dark:text-zinc-700'
-                      }`}>
-                      {task.status === 'completed' ? (
-                        <CheckCircle2 className="w-5 h-5" strokeWidth={2.5} />
-                      ) : (
-                        <Circle className="w-5 h-5" strokeWidth={2.5} />
-                      )}
-                    </div>
+              .map((task) => {
+                const now = dayjs();
+                const taskDate = dayjs(task.conditionDate);
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-col">
-                        <div className="flex items-center justify-between gap-2 mb-0.5">
-                          <h3 className={`text-base font-bold truncate ${task.status === 'completed' ? 'text-zinc-400 dark:text-zinc-500 line-through' : 'text-zinc-900 dark:text-zinc-100'}`}>
-                            {task.title}
-                          </h3>
-                          {task.amount > 0 && (
-                            <div className="shrink-0 flex items-center bg-zinc-100 dark:bg-zinc-800/80 px-2 py-0.5 rounded-lg text-[10px] font-black text-zinc-900 dark:text-zinc-100 border border-zinc-200/50 dark:border-zinc-700/50">
-                              <DollarSign className="w-2.5 h-2.5 mr-0.5" />
-                              {task.amount.toLocaleString()}
+                let isExecutedInPeriod = false;
+                if (task.frequency === 'daily') {
+                  // If conditionDate is tomorrow or later, it means it was executed today
+                  isExecutedInPeriod = taskDate.isAfter(now, 'day');
+                } else if (task.frequency === 'weekly') {
+                  // If conditionDate is in next week or later, it was executed this week
+                  isExecutedInPeriod = taskDate.isAfter(now, 'week');
+                } else if (task.frequency === 'monthly') {
+                  // If conditionDate is in next month or later, it was executed this month
+                  isExecutedInPeriod = taskDate.isAfter(now, 'month');
+                } else if (task.frequency === 'yearly') {
+                  // If conditionDate is in next year or later, it was executed this year
+                  isExecutedInPeriod = taskDate.isAfter(now, 'year');
+                }
+
+                return (
+                  <motion.div
+                    key={task.id}
+                    variants={itemVariants}
+                    layout
+                    onClick={() => editTask(task)}
+                    className="group relative bg-white dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-zinc-800/50 p-4 rounded-[24px] transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800/30 active:scale-[0.98] cursor-pointer"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className={`shrink-0 transition-transform group-hover:scale-110 mt-0.5 ${task.status === 'completed'
+                        ? 'text-emerald-500'
+                        : isExecutedInPeriod
+                          ? 'text-blue-500'
+                          : 'text-zinc-300 dark:text-zinc-700'
+                        }`}>
+                        {task.status === 'completed' || isExecutedInPeriod ? (
+                          <CheckCircle2 className="w-6 h-6" strokeWidth={2.5} />
+                        ) : (
+                          <Circle className="w-6 h-6" strokeWidth={2.5} />
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1">
+                              <h3 className={`text-base font-bold leading-tight ${task.status === 'completed'
+                                ? 'text-zinc-400 dark:text-zinc-500 line-through'
+                                : 'text-zinc-900 dark:text-zinc-100'
+                                }`}>
+                                {task.title}
+                              </h3>
+                              {isExecutedInPeriod && task.status !== 'completed' && (
+                                <div className="flex items-center gap-1 mt-1">
+                                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20">
+                                    <CheckCircle2 className="w-3 h-3 text-blue-600 dark:text-blue-400" strokeWidth={2.5} />
+                                    <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                                      Ejecutado {
+                                        task.frequency === 'daily' ? 'hoy' :
+                                          task.frequency === 'weekly' ? 'esta semana' :
+                                            task.frequency === 'monthly' ? 'este mes' :
+                                              task.frequency === 'yearly' ? 'este año' : ''
+                                      }
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-
-                        <p className="text-zinc-500 dark:text-zinc-400 text-[13px] leading-snug line-clamp-1 font-medium opacity-80 mb-2">
-                          {task.description}
-                        </p>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[9px] uppercase tracking-widest font-black px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/50">
-                              {task.type}
-                            </span>
-                            <div className="flex items-center gap-3 text-[11px] font-semibold text-zinc-400 dark:text-zinc-500">
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {task.hour}
-                              </span>
-                              <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-                              <div className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
-                                <span>{dayjs(task.conditionDate).format('DD MMM')}</span>
+                            {task.amount > 0 && (
+                              <div className="shrink-0 flex items-center bg-emerald-500/10 dark:bg-emerald-500/20 px-2.5 py-1 rounded-lg border border-emerald-500/20 dark:border-emerald-500/30">
+                                <DollarSign className="w-3 h-3 mr-0.5 text-emerald-600 dark:text-emerald-400" strokeWidth={2.5} />
+                                <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400">
+                                  {task.amount.toLocaleString()}
+                                </span>
                               </div>
-                            </div>
+                            )}
                           </div>
 
-                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <span className="text-[10px] font-bold text-zinc-400 uppercase">Editar</span>
-                            <ChevronRight className="w-3.5 h-3.5 text-zinc-400" />
+                          {task.description && (
+                            <p className="text-zinc-500 dark:text-zinc-400 text-[13px] leading-snug line-clamp-2 font-medium">
+                              {task.description}
+                            </p>
+                          )}
+
+                          <div className="flex items-center justify-between pt-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-[9px] uppercase tracking-widest font-black px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/50">
+                                {task.type}
+                              </span>
+                              <div className="flex items-center gap-2 text-[11px] font-semibold text-zinc-400 dark:text-zinc-500">
+                                <span className="flex items-center gap-1">
+                                  <Clock className="w-3 h-3" strokeWidth={2.5} />
+                                  {task.hour}
+                                </span>
+                                <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" strokeWidth={2.5} />
+                                  <span>{dayjs(task.conditionDate).format('DD MMM')}</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <span className="text-[10px] font-bold text-zinc-400 uppercase">Editar</span>
+                              <ChevronRight className="w-3.5 h-3.5 text-zinc-400" />
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
           </AnimatePresence>
         </motion.div>
       </main>

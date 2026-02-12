@@ -116,6 +116,7 @@ export default function DrawerTask({
   const filteredCategories = categories.filter((category: any) => {
     if (categoryType === "income") return category.type === 1;
     if (categoryType === "expense") return category.type === 2;
+    if (categoryType === "savings") return category.type === 3;
     return true;
   });
 
@@ -123,6 +124,7 @@ export default function DrawerTask({
     setForm({ ...form, type: val });
     if (val === "income") setCategoryType("income");
     if (val === "expense") setCategoryType("expense");
+    if (val === "savings") setCategoryType("savings");
   };
 
   return (
@@ -191,6 +193,7 @@ export default function DrawerTask({
                         <SelectItem value="Trabajo">Trabajo</SelectItem>
                         <SelectItem value="income">Ingreso (Finanza)</SelectItem>
                         <SelectItem value="expense">Gasto (Finanza)</SelectItem>
+                        <SelectItem value="savings">Ahorro (Finanza)</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -210,6 +213,7 @@ export default function DrawerTask({
                         <SelectItem value="all">Todos</SelectItem>
                         <SelectItem value="income">Ingresos</SelectItem>
                         <SelectItem value="expense">Gastos</SelectItem>
+                        <SelectItem value="savings">Ahorros</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -261,14 +265,14 @@ export default function DrawerTask({
                     value={form.description}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
                     placeholder="Detalles adicionales..."
-                    className={`w-full min-h-[60px] px-4 py-3 text-sm rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border  border-zinc-200 dark:border-zinc-800 focus:ring-1 focus:ring-zinc-900/40 dark:focus:ring-zinc-200 focus:border-zinc-900/10 dark:focus:border-zinc-100/10 outline-none transition-all resize-none text-zinc-800 dark:text-zinc-200 ${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    className={`w-full min-h-[60px] px-4 py-3 text-sm rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 focus:ring-1 focus:ring-zinc-900/40 dark:focus:ring-zinc-200 focus:border-zinc-900/10 dark:focus:border-zinc-100/10 outline-none transition-all resize-none text-zinc-800 dark:text-zinc-200 ${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Frecuencia</label>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Programación</label>
+                <div className="grid grid-cols-[1.5fr_1fr_1fr] gap-2">
                   <Select
                     disabled={isReadOnly}
                     value={form.frequency}
@@ -286,53 +290,50 @@ export default function DrawerTask({
                       </SelectGroup>
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Fecha</label>
-                    <Input
-                      disabled={isReadOnly}
-                      type="date"
-                      value={form.conditionDate}
-                      onChange={(e) => setForm({ ...form, conditionDate: e.target.value })}
-                      className={`${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 ml-1">Hora</label>
+
+                  <Input
+                    disabled={isReadOnly}
+                    type="date"
+                    value={form.conditionDate}
+                    onChange={(e) => setForm({ ...form, conditionDate: e.target.value })}
+                    className={`${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  />
+
+                  <div className="relative">
+                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
                     <Input
                       disabled={isReadOnly}
                       type="time"
                       value={form.hour}
                       onChange={(e) => setForm({ ...form, hour: e.target.value })}
-                      className={`${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      className={`pl-9 ${isReadOnly ? 'opacity-70 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <DrawerFooter className="px-6 py-4">
-            <hr className="mb-4" />
-            <div className="flex items-center gap-3">
-              <button
-                onClick={close}
-                className="flex-1 h-12 rounded-xl font-bold text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all active:scale-95"
-              >
-                {isReadOnly ? "Cerrar" : "Cancelar"}
-              </button>
-
-              {!isReadOnly && (
-                <Button
-                  onClick={saveTask}
-                  className="flex-2 h-12 font-bold px-8"
+            <DrawerFooter className="px-6 py-4">
+              <hr className="mb-4" />
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={close}
+                  className="flex-1 h-12 rounded-xl font-bold text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all active:scale-95"
                 >
-                  Guardar
-                </Button>
-              )}
-            </div>
-          </DrawerFooter>
+                  {isReadOnly ? "Cerrar" : "Cancelar"}
+                </button>
+
+                {!isReadOnly && (
+                  <Button
+                    onClick={saveTask}
+                    className="flex-2 h-12 font-bold px-8"
+                  >
+                    Guardar
+                  </Button>
+                )}
+              </div>
+            </DrawerFooter>
+          </div>
         </div>
       </DrawerContent>
     </Drawer>

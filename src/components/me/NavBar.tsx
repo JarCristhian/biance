@@ -26,7 +26,7 @@ export function NavBar() {
   const pathname = usePathname();
   const [show, setShow] = useState<boolean>(false);
   const [greeting, setGreeting] = useState<string>("");
-  const { executedTask, newNotification } = useSocket();
+  const { newNotification } = useSocket();
   const { setRefreshFinance } = useGlobalStore();
 
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -45,15 +45,6 @@ export function NavBar() {
   }, []);
 
   useEffect(() => {
-    if (executedTask) {
-      toast.success(executedTask.message, {
-        description: executedTask.title,
-      });
-      setRefreshFinance();
-    }
-  }, [executedTask]);
-
-  useEffect(() => {
     const token = (session as any)?.token || (session as any)?.user?.token || (session as any)?.accessToken;
     if (token) {
       fetchNotifications(token);
@@ -62,13 +53,16 @@ export function NavBar() {
 
   useEffect(() => {
     if (newNotification) {
-      toast.info(newNotification.title, {
+      toast.success(newNotification.title, {
         description: newNotification.description,
       });
       const token = (session as any)?.token || (session as any)?.user?.token || (session as any)?.accessToken;
       if (token) {
         fetchNotifications(token);
       }
+      setTimeout(() => {
+        setRefreshFinance();
+      }, 1000);
     }
   }, [newNotification]);
 
