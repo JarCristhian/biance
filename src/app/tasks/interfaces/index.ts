@@ -4,16 +4,9 @@ export interface Props {
   setNote: () => void;
 }
 
-export interface GetCategory {
-  id: number;
-  type: number;
-  name: string;
-  status: boolean;
-  createdAt: string;
-}
 
-export interface StoreCategory {
-  id?: number;
+export interface Category {
+  id: number;
   name: string;
   typeId: number;
   status: boolean;
@@ -33,6 +26,7 @@ export interface GetTask {
   status: 'pending' | 'completed' | 'cancelled';
   updatedAt: string;
   authorId: number;
+  category: Category;
 }
 
 export interface StoreTask {
