@@ -56,7 +56,7 @@ export default function TasksPage() {
     try {
       setLoadingTasks(true);
       const result = await taskService.getTasks({}, token);
-      console.log("Tasks fetched:", result.data);
+      // console.log("Tasks fetched:", result.data);
       setTasks(result.data || []);
     } catch (error) {
       console.error("Error fetching tasks:", error);

@@ -159,7 +159,7 @@ export default function TableHome({ setDataFinance, menu }: Props) {
                     name="arrow"
                     width={
                       "w-5 " +
-                      (menu === 1 ? "text-blue-500" : invoice.income > 0
+                      (menu === 1 ? "text-blue-500 rotate-90" : invoice.income > 0
                         ? "text-green-500"
                         : "text-red-500 rotate-180")
                     }

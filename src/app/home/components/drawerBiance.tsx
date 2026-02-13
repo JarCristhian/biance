@@ -45,6 +45,7 @@ export default function DrawerBiance({
   const financeService = new FinanceService();
   const [categoryList, setCategoryList] = useState<GetCategory[]>([]);
   const [error, setError] = useState<string>("");
+  const [updated, setUpdated] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const { setRefreshFinance, daySelected, setCategories, categories } = useGlobalStore();
 
@@ -117,6 +118,7 @@ export default function DrawerBiance({
 
       if (result.status !== 500 && result.status !== 400) {
         toast.success(data.id ? "Se ha actualizado correctamente.." : "Se ha registrado correctamente..");
+        setUpdated(true);
         setTimeout(() => { setLoading(false); }, 300);
         if (data.id) { close(); } else { clear(); }
       }
@@ -137,7 +139,10 @@ export default function DrawerBiance({
   };
 
   const close = () => {
-    setRefreshFinance();
+    if (updated) {
+      setRefreshFinance();
+      setUpdated(false);
+    }
     onClose();
     clear();
   };
